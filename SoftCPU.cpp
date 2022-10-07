@@ -12,7 +12,10 @@ const int version_CPU = 1;
 int main()
 {  
     FILE *code_bin    = fopen("./Code_machine.bin", "rb");
+    FILE *result      = fopen("Result.txt", "w");
+    
     assert(code_bin);
+    assert(result);
 
     size_t file_size  = get_file_size(code_bin);
     Header *data      = (Header *)calloc(file_size, 1);
@@ -45,7 +48,7 @@ int main()
         cmd_count++;
         int a = 0,
             b = 0;
-            
+
         switch(code[IP])
         {
             case CMD_PUSH:
@@ -90,25 +93,27 @@ int main()
             case CMD_OUT:
             {
                 StackPop(main_stk, &a);
+
                 printf("Value: %d", a);
-                FILE *result = fopen("Result.txt", "w");
-                assert(result);
                 fprintf(result, "Result = %d", a);
-                assert(!fclose(result));
+
                 IP++;
                 break;
             }
             case CMD_HLT:
             {
+                assert(!fclose(result));
                 return 0;
             }
             default:
             {
                 printf("Error. Non-existent command: %d\n", code[IP]);
+                assert(!fclose(result));
                 return 1;
             }
         }
     }
-
+    
+    assert(!fclose(result));
     return 0;
 }
