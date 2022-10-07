@@ -25,10 +25,10 @@ enum STACK_ERRORS
 };
 
 int SetBirds(stack_id stk_id_ptr);
-int StackCtor(stack_id *stk_id, size_t capacity = 100, elem_t POISON = -0x4FFFFFFF);
+int StackCtor(stack_id *stk_id, size_t capacity = 10, elem_t POISON = -0x4FFFFFFF);
 int StackPush(stack_id stk_id, elem_t item);
 int StackPop(stack_id stk_id, elem_t *target);
-int StackDtor(stack_id stk_id); 
+int StackDtor(stack_id *stk_id); 
 int StackOk(stack_id stk_id);
 void PrintStack(stack_id stk_id);
 

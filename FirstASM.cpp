@@ -40,6 +40,10 @@ int main()
 
     while(line < input_data.nLines)
     {
+        if (char *comment = strchr(input_data.lines[line].start, ';'))
+        {
+            comment[1] = '\0';
+        }
         sscanf(input_data.lines[line].start, "%s%n", cmd, &position);
 
         if (stricmp(cmd, cmds[CMD_PUSH]) == 0)

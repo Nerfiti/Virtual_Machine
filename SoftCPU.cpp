@@ -9,6 +9,15 @@
 
 const int version_CPU = 1;
 
+struct SoftCPU
+{
+    Header head = {};
+    int *code = nullptr;
+    int IP = 0;
+    stack_id main_stk = 0;
+};
+
+
 int main()
 {  
     FILE *code_bin    = fopen("./Code_machine.bin", "rb");
@@ -18,86 +27,94 @@ int main()
     assert(result);
 
     size_t file_size  = get_file_size(code_bin);
+
     Header *data      = (Header *)calloc(file_size, 1);
     assert(data);
 
     fread(data, file_size, 1, code_bin);
     assert(!fclose(code_bin));
 
-    if (strcmp(data->signature, "PDA"))
+    SoftCPU CPU =
+    {
+        .head     = *data,
+        .code     = (int *)(data + 1),
+        .IP       = 0,
+        .main_stk = 0
+    };
+
+    if (strcmp(CPU.head.signature, "PDA"))
     {
         printf("Wrong signature!");
         return -1;
     }
-    if (data->version != version_CPU)
+    if (CPU.head.version != version_CPU)
     {
         printf("Wrong program version!");
         return -1;
     }
 
-    int cmd_count      = 0;
-    int number_of_cmds = data->numbers_of_the_commands;
-    int IP             = 0;
-    int *code          = (int *)(data + 1);
-    stack_id main_stk  = 0;
-    
-    StackCtor(&main_stk, 4);
+    StackCtor(&(CPU.main_stk));
 
-    while(cmd_count < number_of_cmds)
+    int cmd_count = 0;
+    while(cmd_count < CPU.head.numbers_of_the_commands)
     {
         cmd_count++;
         int a = 0,
             b = 0;
-
-        switch(code[IP])
+        printf("CPU.code[%d] = %d\n", CPU.IP, CPU.code[CPU.IP]);
+        switch(CPU.code[CPU.IP])
         {
             case CMD_PUSH:
             {
-                StackPush(main_stk, code[IP + 1]);
-                IP += 2;
+                printf("CPU.code[%d] = %d\n", CPU.IP + 1, CPU.code[CPU.IP + 1]);
+                StackPush(CPU.main_stk, CPU.code[CPU.IP + 1]);
+                CPU.IP += 2;
                 break;
             }
             case CMD_ADD:
             {
-                StackPop(main_stk, &a);
-                StackPop(main_stk, &b);
-                StackPush(main_stk, a + b);
-                IP++;
+                StackPop(CPU.main_stk, &a);
+                StackPop(CPU.main_stk, &b);
+                StackPush(CPU.main_stk, a + b);
+                CPU.IP++;
                 break;
             }
             case CMD_SUB:
             {
-                StackPop(main_stk, &a);
-                StackPop(main_stk, &b);
-                StackPush(main_stk, b - a);
-                IP++;
+                StackPop(CPU.main_stk, &a);
+                StackPop(CPU.main_stk, &b);
+                StackPush(CPU.main_stk, b - a);
+                CPU.IP++;
                 break;
             }
             case CMD_MUL:
             {
-                StackPop(main_stk, &a);
-                StackPop(main_stk, &b);
-                StackPush(main_stk, a * b);
-                IP++;
+                StackPop(CPU.main_stk, &a);
+                printf("PIZDAAAAAAAAAAAAAAAAAA!\n");
+                StackPop(CPU.main_stk, &b);
+                printf("BLYAAAAAAAAAAAAAAAAAAA!\n");
+                StackPush(CPU.main_stk, a * b);
+                CPU.IP++;
                 break;
             }
             case CMD_DIV:
             {
-                StackPop(main_stk, &a);
-                StackPop(main_stk, &b);
-                assert(b != 0);
-                StackPush(main_stk, b / a);
-                IP++;
+                StackPop(CPU.main_stk, &a);
+                StackPop(CPU.main_stk, &b);
+                printf("a = %d, b = %d\n", a, b);
+                assert(a != 0);
+                StackPush(CPU.main_stk, b / a);
+                CPU.IP++;
                 break;
             }
             case CMD_OUT:
             {
-                StackPop(main_stk, &a);
+                StackPop(CPU.main_stk, &a);
 
                 printf("Value: %d", a);
                 fprintf(result, "Result = %d", a);
 
-                IP++;
+                CPU.IP++;
                 break;
             }
             case CMD_HLT:
@@ -107,7 +124,7 @@ int main()
             }
             default:
             {
-                printf("Error. Non-existent command: %d\n", code[IP]);
+                printf("Error. Non-existent command: %d\n", CPU.code[CPU.IP]);
                 assert(!fclose(result));
                 return 1;
             }
