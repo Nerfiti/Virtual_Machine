@@ -44,12 +44,18 @@ The file must consist of valid commands, located on separate lines. If the comma
 
 Valid commands (with their numbers in the machine code):
 
-1 = PUSH [one argument] - push number-argument on the CPU stack
-2 = ADD                 - adds       the top 2 numbers from the stack
-3 = SUB                 - subtracts  the top number of the stack from the penultimate one
-4 = MUL                 - multiplies the top 2 numbers from the stack
-5 = DIV                 - divides    the penultimate number in the stack by the top number of the stack
-6 = OUT                 - prints the top number of the stack to a file "Result.txt"
-7 = HLT                 - terminates the CPU
+1 = PUSH [one argument] -- push number-argument on the CPU stack
+
+2 = ADD                 -- adds       the top 2 numbers from the stack
+
+3 = SUB                 -- subtracts  the top number of the stack from the penultimate one
+
+4 = MUL                 -- multiplies the top 2 numbers from the stack
+
+5 = DIV                 -- divides    the penultimate number in the stack by the top number of the stack
+
+6 = OUT                 -- prints the top number of the stack to a file "Result.txt"
+
+7 = HLT                 -- terminates the CPU
 
 ---------------------------------------------------------------------------------------------
