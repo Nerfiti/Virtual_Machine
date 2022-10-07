@@ -3,7 +3,7 @@
 typedef long long CANARY_t;
 typedef unsigned long long Hash;
 
-const int factor = 2;
+const int factor                    = 2;
 const CANARY_t CANARY               = 0xFEEEB1ED;
 
 struct stack
@@ -77,11 +77,10 @@ int StackPush(stack_id stk_id, elem_t item)
 
     if (err = StackOk(stk))
     {
+        printf("StackOK = %d\n", err);
+        PrintStack(stk_id);
         return err;
     }
-
-    printf("BEFORE PUSH:\n");
-    PrintStack(stk_id);
     
     if (err = StackResize_UP(stk))
     {
@@ -94,9 +93,6 @@ int StackPush(stack_id stk_id, elem_t item)
     stk->STACK_HASH = GenHash((CANARY_t *)stk + 1, sizeof(stack) - 2*sizeof(CANARY_t) - 2*sizeof(Hash));
     stk->DATA_HASH  = GenHash(stk->data, stk->capacity*sizeof(elem_t));
 
-    printf("AFTER PUSH:\n");
-    PrintStack(stk_id);
-
     return StackOk(stk);
 }
 
@@ -107,12 +103,10 @@ int StackPop(stack_id stk_id, elem_t *target)
     
     if (err = StackOk(stk))
     {
-        printf("StackOK = %d", err);
+        printf("StackOK = %d\n", err);
+        PrintStack(stk_id);
         return err;
     }
-
-    printf("BEFORE POP:\n");
-    PrintStack(stk_id);
     
     stk->size--;
     *target              = stk->data[stk->size];
@@ -125,9 +119,6 @@ int StackPop(stack_id stk_id, elem_t *target)
 
     stk->STACK_HASH = GenHash((CANARY_t *)stk + 1, sizeof(stack) - 2*sizeof(CANARY_t) - 2*sizeof(Hash));
     stk->DATA_HASH = GenHash(stk->data, stk->capacity*sizeof(elem_t));
-
-    printf("AFTER POP:\n");
-    PrintStack(stk_id);
     
     return StackOk(stk);
 }

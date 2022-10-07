@@ -5,7 +5,7 @@
 #include "Comp_Generals.h"
 #include "linesLib.h"
     
-const int version_ASM = 1;
+const int version_ASM = 2;
 
 int main()
 {
@@ -85,6 +85,13 @@ int main()
             code[IP] = CMD_DIV;
             IP++;
         }
+        else if (stricmp(cmd, cmds[CMD_DUP]) == 0)
+        {
+            fprintf(output_file, "%-16s | %d\n", cmds[CMD_DUP], CMD_DUP);
+
+            code[IP] = CMD_DUP;
+            IP++;
+        }
         else if (stricmp(cmd, cmds[CMD_OUT]) == 0)
         {
             fprintf(output_file, "%-16s | %d\n", cmds[CMD_OUT], CMD_OUT);
@@ -94,10 +101,11 @@ int main()
         }
         else if (stricmp(cmd, cmds[CMD_HLT]) == 0)
         {
-            fprintf(output_file, "%-16s | %d\n", cmds[CMD_PUSH], CMD_HLT);
+            fprintf(output_file, "%-16s | %d\n", cmds[CMD_HLT], CMD_HLT);
 
             code[IP] = CMD_HLT;
             IP++;
+            break;
         }
         line++;
     }

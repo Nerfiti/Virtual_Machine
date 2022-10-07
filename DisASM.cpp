@@ -6,7 +6,7 @@
 #include "Comp_Generals.h"
 #include "linesLib.h"
 
-const int version_CPU = 1;
+const int version_CPU = 2;
 
 int main()
 {  
@@ -76,6 +76,12 @@ int main()
                 IP++;
                 break;
             }
+            case CMD_DUP:
+            {
+                fprintf(DisASM_result, "DUP\n");
+                IP++;
+                break;
+            }
             case CMD_OUT:
             {
                 fprintf(DisASM_result, "OUT\n");
@@ -85,11 +91,14 @@ int main()
             case CMD_HLT:
             {
                 fprintf(DisASM_result, "HLT\n");
-                break;
+                assert(!fclose(DisASM_result));
+                return 0;
             }
             default:
             {
                 fprintf(DisASM_result, "Error. Non-existent command: %d\n", code[IP]);
+                assert(!fclose(DisASM_result));
+                return 0;
             }
         }
     }

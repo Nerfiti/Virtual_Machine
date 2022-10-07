@@ -3,24 +3,25 @@
 
 static const int maximum_cmd_length = 4;
 static const int signature_length   = 4;
-static const int num_cmds           = 7;
+static const int num_cmds           = 8;
 
 struct Header
 {
     const char signature[signature_length] = "PDA";
-    const int version                      = 1;
+    const int version                      = 2;
     long long numbers_of_the_commands      = 0;
 };
 
 enum cmd
 {
     CMD_PUSH = 1,
-    CMD_ADD  = 2,    //a + b
-    CMD_SUB  = 3,    //a - b
-    CMD_MUL  = 4,    //a * b
-    CMD_DIV  = 5,    //a / b
-    CMD_OUT  = 6,    //print
-    CMD_HLT  = 7     // end
+    CMD_ADD  = 2,    //  a + b
+    CMD_SUB  = 3,    //  a - b
+    CMD_MUL  = 4,    //  a * b
+    CMD_DIV  = 5,    //  a / b
+    CMD_DUP  = 6,    //duplicate
+    CMD_OUT  = 7,    //  print
+    CMD_HLT  = 8     //   end
 };
 
 const char cmds[num_cmds + 1][maximum_cmd_length + 1] = 
@@ -31,6 +32,7 @@ const char cmds[num_cmds + 1][maximum_cmd_length + 1] =
     "SUB",
     "MUL",
     "DIV",
+    "DUP",
     "OUT",
     "HLT"
 };

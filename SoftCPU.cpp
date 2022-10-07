@@ -7,7 +7,7 @@
 #include "linesLib.h"
 #include "stack.h"
 
-const int version_CPU = 1;
+const int version_CPU = 2;
 
 struct SoftCPU
 {
@@ -61,12 +61,11 @@ int main()
         cmd_count++;
         int a = 0,
             b = 0;
-        printf("CPU.code[%d] = %d\n", CPU.IP, CPU.code[CPU.IP]);
+        
         switch(CPU.code[CPU.IP])
         {
             case CMD_PUSH:
             {
-                printf("CPU.code[%d] = %d\n", CPU.IP + 1, CPU.code[CPU.IP + 1]);
                 StackPush(CPU.main_stk, CPU.code[CPU.IP + 1]);
                 CPU.IP += 2;
                 break;
@@ -90,9 +89,7 @@ int main()
             case CMD_MUL:
             {
                 StackPop(CPU.main_stk, &a);
-                printf("PIZDAAAAAAAAAAAAAAAAAA!\n");
                 StackPop(CPU.main_stk, &b);
-                printf("BLYAAAAAAAAAAAAAAAAAAA!\n");
                 StackPush(CPU.main_stk, a * b);
                 CPU.IP++;
                 break;
@@ -101,19 +98,24 @@ int main()
             {
                 StackPop(CPU.main_stk, &a);
                 StackPop(CPU.main_stk, &b);
-                printf("a = %d, b = %d\n", a, b);
                 assert(a != 0);
                 StackPush(CPU.main_stk, b / a);
+                CPU.IP++;
+                break;
+            }
+            case CMD_DUP:
+            {
+                StackPop (CPU.main_stk, &a);
+                StackPush(CPU.main_stk,  a);
+                StackPush(CPU.main_stk,  a);
                 CPU.IP++;
                 break;
             }
             case CMD_OUT:
             {
                 StackPop(CPU.main_stk, &a);
-
                 printf("Value: %d", a);
                 fprintf(result, "Result = %d", a);
-
                 CPU.IP++;
                 break;
             }
