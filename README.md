@@ -6,7 +6,7 @@ This program allows you to perform the simplest arithmetic operations with integ
 
 "ASM.exe"
 
-To get the file "ASM.exe", it is necessary to compile the files "FirstASM.cpp", "LinesLib.cpp" and "MyGeneralFunctions.cpp"
+To get the file "ASM.exe", it is necessary to compile the files "ASM.cpp", "ASM_UTILS.cpp", "LinesLib.cpp" and "MyGeneralFunctions.cpp"
 
 "ASM.exe" translates "input.txt" into the machine code executed by the file "CPU.exe" and get the file "Listing.txt".
 
@@ -14,7 +14,7 @@ To get the file "ASM.exe", it is necessary to compile the files "FirstASM.cpp", 
 
 "DisASM.exe"
 
-To get the file "DisASM.exe", it is necessary to compile the files "DisASM.cpp", "LinesLib.cpp" and "MyGeneralFunctions.cpp"
+To get the file "DisASM.exe", it is necessary to compile the files "DisASM.cpp", "DisASM_UTILS.cpp", "LinesLib.cpp" and "MyGeneralFunctions.cpp"
 
 "DisASM.exe" translates "Code_machine.bin" to a text file with a description of the commands.
 
@@ -22,7 +22,7 @@ To get the file "DisASM.exe", it is necessary to compile the files "DisASM.cpp",
 
 "CPU.exe"
 
-To get the file "CPU.exe", it is necessary to compile the files "SoftCPU.cpp", "LinesLib.cpp", "MyGeneralFunctions.cpp" and "Stack.cpp"
+To get the file "CPU.exe", it is necessary to compile the files "SoftCPU.cpp", "CPU_UTILS.cpp", "LinesLib.cpp", "MyGeneralFunctions.cpp" and "Stack.cpp"
 
 "CPU.exe" executes code from "Code_machine.bin" and writes the result to a file "Result.txt"
 
