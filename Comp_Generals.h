@@ -2,14 +2,13 @@
 #define COMP_GENERALS_H
 
 static const int maximum_cmd_length = 4;
-static const int signature_length   = 4;
+static const int signature_length   = 12;
 static const int num_cmds           = 8;
 
 struct Header
 {
     const char signature[signature_length] = "PDA";
-    const int version                      = 2;
-    long long numbers_of_the_commands      = 0;
+    const int  version                      = 2;
 };
 
 enum cmd
