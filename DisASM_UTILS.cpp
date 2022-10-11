@@ -1,6 +1,6 @@
 #include "DisASM_UTILS.h"
 
-const int   version_CPU     = 3;
+const int   version_CPU     = 4;
 const char *input_filename  = "./Code_machine.bin";
 const char *output_filename = "./DisASM Result.txt";
 
@@ -93,6 +93,42 @@ void execute_ASM(DisASM *disasm)
             case CMD_JMP:
             {
                 fprintf(DisASM_result, "JMP %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_JB:
+            {
+                fprintf(DisASM_result, "JB %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_JBE:
+            {
+                fprintf(DisASM_result, "JBE %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_JA:
+            {
+                fprintf(DisASM_result, "JA %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_JAE:
+            {
+                fprintf(DisASM_result, "JAE %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_JE:
+            {
+                fprintf(DisASM_result, "JE %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_JNE:
+            {
+                fprintf(DisASM_result, "JNE %d\n", disasm->code[disasm->IP + 1]);
                 disasm->IP += 2;
                 break;
             }
