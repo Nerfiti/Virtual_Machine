@@ -25,7 +25,7 @@ void init_ASM(Text *input_data)
 }
 
 
-void execute_ASM(Text input_data)
+void execute_ASM(Text input_data, bool first_assemble)
 {
     FILE *listing_file = fopen(listing_filename, "w");
     FILE *out_bin      = fopen(out_bin_filename, "wb");
@@ -37,6 +37,7 @@ void execute_ASM(Text input_data)
     int line     = 0;
     int position = 0;
     int IP       = 0;
+    ASM.index    = 0;
 
     char cmd[maximum_cmd_length + 1] = "";  
     assert(code);
@@ -105,6 +106,21 @@ void execute_ASM(Text input_data)
             code[IP] = CMD_OUT;
             IP++;
         }
+        else if (stricmp(cmd, cmds[CMD_JMP]) == 0)
+        {
+            code[IP] = CMD_JMP;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JMP], arg, CMD_JMP, code[IP - 1]);
+        }
         else if (stricmp(cmd, cmds[CMD_HLT]) == 0)
         {
             fprintf(listing_file, "%-16s | %d\n", cmds[CMD_HLT], CMD_HLT);
@@ -117,17 +133,17 @@ void execute_ASM(Text input_data)
         {
             if (strchr(cmd, ':'))
             {
-                printf("%s\n", cmd);
                 int name_num = 0;
                 if ((name_num = SearchName(cmd)) != -1)
                 {
-                    ASM.label_arr[name_num].value = IP + 1;
-                    continue;
+                    ASM.label_arr[name_num].value = IP;
                 }
-                sscanf(cmd, "%s:", ASM.label_arr[ASM.index].name);
-                ASM.label_arr[ASM.index].value = IP + 1;
-
-                ASM.index++;
+                else
+                {
+                    sscanf(cmd, "%s:", ASM.label_arr[ASM.index].name);
+                    ASM.label_arr[ASM.index].value = IP;
+                    ASM.index++;
+                }
             }
         }
         line++;
@@ -135,12 +151,6 @@ void execute_ASM(Text input_data)
 
     fwrite(&head, sizeof(char), sizeof(Header)  , out_bin);
     fwrite(code , sizeof(char), IP * sizeof(int), out_bin);
-    
-    for (int i = 0; i < ASM.index; ++i)
-    {
-        fprintf(listing_file, "%s: %d\n", 
-            ASM.label_arr[i].name, ASM.label_arr[i].value);
-    }
 
     assert(!fclose(listing_file));
     assert(!fclose(out_bin    ));
@@ -148,9 +158,8 @@ void execute_ASM(Text input_data)
 
 int SearchName(char *name)
 {
-    for (int i = 0; i < ASM.index; ++i)
+    for (int i = 0; i < label_arr_size; ++i)
     {
-        printf("i = %d\n", i);
         if (stricmp(name, ASM.label_arr[i].name) == 0)
         {
             return i;

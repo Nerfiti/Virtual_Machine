@@ -1,26 +1,15 @@
-; 1 = PUSH
-; 2 = ADD
-; 3 = SUB
-; 4 = MUL
-; 5 = DIV
-; 6 = DUP
-; 7 = OUT
-; 8 = HLT
 push 22
-dup
-Hello: 
+out
+jmp jump:
 push 3
 add
 sub
-Put:
 push 100
 mul
+jump:
 push 10
 push 5
 add
 div
 out
-hlt
-hlt
-hlt
 hlt

@@ -1,6 +1,6 @@
 #include "CPU_UTILS.h"
 
-const int   version_CPU     = 2;
+const int   version_CPU     = 3;
 const char *input_filename  = "./Code_machine.bin";
 const char *output_filename = "./Result.txt";
 
@@ -29,12 +29,12 @@ void init_CPU(SoftCPU *CPU)
     if (strcmp(CPU->head->signature, "PDA"))
     {
         printf("Wrong signature!");
-        abort;
+        abort();
     }
     if (CPU->head->version != version_CPU)
     {
         printf("Wrong program version!");
-        abort;
+        abort();
     }
 }
 
@@ -100,6 +100,11 @@ void execute_CPU(SoftCPU *CPU)
                 printf("Value: %d", a);
                 fprintf(CPU->result, "Result = %d", a);
                 CPU->IP++;
+                break;
+            }
+            case CMD_JMP:
+            {
+                CPU->IP = CPU->code[CPU->IP + 1];
                 break;
             }
             case CMD_HLT:

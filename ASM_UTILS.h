@@ -28,7 +28,7 @@ struct ASM_t
 
 
 void init_ASM(Text *input_data);
-void execute_ASM(Text input_data);
+void execute_ASM(Text input_data, bool first_assemble);
 int SearchName(char *name);
 
 #endif //ASM_UTILS_H
