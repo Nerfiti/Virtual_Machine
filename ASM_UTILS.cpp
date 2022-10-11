@@ -121,6 +121,96 @@ void execute_ASM(Text input_data, bool first_assemble)
 
             fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JMP], arg, CMD_JMP, code[IP - 1]);
         }
+        else if (stricmp(cmd, cmds[CMD_JB]) == 0)
+        {
+            code[IP] = CMD_JB;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JB], arg, CMD_JB, code[IP - 1]);
+        }
+        else if (stricmp(cmd, cmds[CMD_JBE]) == 0)
+        {
+            code[IP] = CMD_JBE;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JBE], arg, CMD_JBE, code[IP - 1]);
+        }
+        else if (stricmp(cmd, cmds[CMD_JA]) == 0)
+        {
+            code[IP] = CMD_JA;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JA], arg, CMD_JA, code[IP - 1]);
+        }
+        else if (stricmp(cmd, cmds[CMD_JAE]) == 0)
+        {
+            code[IP] = CMD_JAE;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JAE], arg, CMD_JAE, code[IP - 1]);
+        }
+        else if (stricmp(cmd, cmds[CMD_JE]) == 0)
+        {
+            code[IP] = CMD_JE;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JE], arg, CMD_JE, code[IP - 1]);
+        }
+        else if (stricmp(cmd, cmds[CMD_JNE]) == 0)
+        {
+            code[IP] = CMD_JNE;
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start, "%*s %s", arg);
+            if ((position = SearchName(arg)) == -1 && !first_assemble)
+            {
+                printf("Syntax Error!");
+                abort();
+            }
+            code[IP + 1] = ASM.label_arr[position].value;
+            IP += 2;
+
+            fprintf(listing_file, "%-3s %-12s | %d %d\n", cmds[CMD_JNE], arg, CMD_JNE, code[IP - 1]);
+        }
         else if (stricmp(cmd, cmds[CMD_HLT]) == 0)
         {
             fprintf(listing_file, "%-16s | %d\n", cmds[CMD_HLT], CMD_HLT);

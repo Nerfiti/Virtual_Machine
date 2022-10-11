@@ -1,6 +1,14 @@
-push 22
+push 1
+dup
+for:
+push 21
 out
-jmp jump:
+add
+dup
+dup
+push 16
+ja jump:
+jmp for:
 push 3
 add
 sub
@@ -10,6 +18,5 @@ jump:
 push 10
 push 5
 add
-div
 out
 hlt

@@ -1,6 +1,6 @@
 #include "CPU_UTILS.h"
 
-const int   version_CPU     = 3;
+const int   version_CPU     = 4;
 const char *input_filename  = "./Code_machine.bin";
 const char *output_filename = "./Result.txt";
 
@@ -97,14 +97,80 @@ void execute_CPU(SoftCPU *CPU)
             case CMD_OUT:
             {
                 StackPop(CPU->main_stk, &a);
-                printf("Value: %d", a);
-                fprintf(CPU->result, "Result = %d", a);
+                printf("Value: %d\n", a);
+                fprintf(CPU->result, "Result = %d\n", a);
                 CPU->IP++;
                 break;
             }
             case CMD_JMP:
             {
                 CPU->IP = CPU->code[CPU->IP + 1];
+                break;
+            }
+            case CMD_JB:
+            {
+                StackPop(CPU->main_stk, &b);
+                StackPop(CPU->main_stk, &a);
+                if (a < b)
+                {
+                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
+                }
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_JBE:
+            {
+                StackPop(CPU->main_stk, &b);
+                StackPop(CPU->main_stk, &a);
+                if (a <= b)
+                {
+                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
+                }
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_JA:
+            {
+                StackPop(CPU->main_stk, &b);
+                StackPop(CPU->main_stk, &a);
+                if (a > b)
+                {
+                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
+                }
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_JAE:
+            {
+                StackPop(CPU->main_stk, &b);
+                StackPop(CPU->main_stk, &a);
+                if (a >= b)
+                {
+                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
+                }
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_JE:
+            {
+                StackPop(CPU->main_stk, &b);
+                StackPop(CPU->main_stk, &a);
+                if (a == b)
+                {
+                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
+                }
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_JNE:
+            {
+                StackPop(CPU->main_stk, &b);
+                StackPop(CPU->main_stk, &a);
+                if (a != b)
+                {
+                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
+                }
+                CPU->IP += 2;
                 break;
             }
             case CMD_HLT:
