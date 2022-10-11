@@ -8,9 +8,11 @@
 ; 8 = HLT
 push 22
 dup
+Hello: 
 push 3
 add
 sub
+Put:
 push 100
 mul
 push 10

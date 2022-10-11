@@ -1,7 +1,7 @@
 #ifndef COMP_GENERALS_H
 #define COMP_GENERALS_H
 
-static const int maximum_cmd_length = 4;
+static const int maximum_cmd_length = 10;
 static const int signature_length   = 12;
 static const int num_cmds           = 8;
 

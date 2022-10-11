@@ -6,7 +6,14 @@ const char *input_filename    = "Input.txt";
 const char *listing_filename  = "Listing.txt";
 const char *out_bin_filename  = "code_machine.bin";
 const int   label_arr_size    = 100;
+
 label l_arr[label_arr_size]   = {};
+
+ASM_t ASM = 
+{
+    .label_arr = l_arr,
+    .index = 0
+};
 
 void init_ASM(Text *input_data)
 {
@@ -106,12 +113,48 @@ void execute_ASM(Text input_data)
             IP++;
             break;
         }
+        else
+        {
+            if (strchr(cmd, ':'))
+            {
+                printf("%s\n", cmd);
+                int name_num = 0;
+                if ((name_num = SearchName(cmd)) != -1)
+                {
+                    ASM.label_arr[name_num].value = IP + 1;
+                    continue;
+                }
+                sscanf(cmd, "%s:", ASM.label_arr[ASM.index].name);
+                ASM.label_arr[ASM.index].value = IP + 1;
+
+                ASM.index++;
+            }
+        }
         line++;
     }
 
     fwrite(&head, sizeof(char), sizeof(Header)  , out_bin);
     fwrite(code , sizeof(char), IP * sizeof(int), out_bin);
     
+    for (int i = 0; i < ASM.index; ++i)
+    {
+        fprintf(listing_file, "%s: %d\n", 
+            ASM.label_arr[i].name, ASM.label_arr[i].value);
+    }
+
     assert(!fclose(listing_file));
     assert(!fclose(out_bin    ));
+}
+
+int SearchName(char *name)
+{
+    for (int i = 0; i < ASM.index; ++i)
+    {
+        printf("i = %d\n", i);
+        if (stricmp(name, ASM.label_arr[i].name) == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
