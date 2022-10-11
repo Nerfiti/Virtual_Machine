@@ -45,12 +45,44 @@ void execute_ASM(DisASM *disasm)
     {
         int a = 0,
             b = 0;
-        
-       switch(disasm->code[disasm->IP])
+
+        switch(disasm->code[disasm->IP])
         {
             case CMD_PUSH:
             {
                 fprintf(DisASM_result, "PUSH %d\n", disasm->code[disasm->IP + 1]);
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_PUSH | 1<<5:
+            {
+                fprintf(DisASM_result, "PUSH ");
+                switch (disasm->code[disasm->IP + 1])
+                {
+                case 1:
+                {
+                    fprintf(DisASM_result, "RAX\n");
+                    break;
+                } 
+                case 2:
+                {
+                    fprintf(DisASM_result, "RBX\n");
+                    break;
+                }
+                case 3:
+                {
+                    fprintf(DisASM_result, "RCX\n");
+                    break;
+                }
+                case 4:
+                {
+                    fprintf(DisASM_result, "RDX\n");
+                    break;
+                }
+                default:
+                    printf("Error: non-existent register");
+                    break;
+                }
                 disasm->IP += 2;
                 break;
             }

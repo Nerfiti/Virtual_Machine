@@ -14,6 +14,8 @@ extern const int   version_CPU;
 extern const char *input_filename;
 extern const char *output_filename;
 
+const int number_of_registers = 5;
+
 struct SoftCPU
 {
     Header *head      = nullptr;
@@ -21,6 +23,7 @@ struct SoftCPU
     int IP            = 0;
     stack_id main_stk = 0;
     FILE *result      = nullptr;
+    int reg[number_of_registers] = {};
 };
 
 void init_CPU   (SoftCPU *CPU);

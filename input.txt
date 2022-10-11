@@ -1,4 +1,15 @@
 push 1
+push RAX
+push RBX
+push RCX
+push RDX
+out
+out
+out
+out
+push 1
+dup
+add
 dup
 for:
 push 21

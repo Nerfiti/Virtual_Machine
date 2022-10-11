@@ -1,8 +1,8 @@
 #include "CPU_UTILS.h"
 
-const int   version_CPU     = 4;
-const char *input_filename  = "./Code_machine.bin";
-const char *output_filename = "./Result.txt";
+const int   version_CPU         = 4;
+const char *input_filename      = "./Code_machine.bin";
+const char *output_filename     = "./Result.txt";
 
 void init_CPU(SoftCPU *CPU)
 {
@@ -50,6 +50,12 @@ void execute_CPU(SoftCPU *CPU)
             case CMD_PUSH:
             {
                 StackPush(CPU->main_stk, CPU->code[CPU->IP + 1]);
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_PUSH | 1<<5:
+            {
+                StackPush(CPU->main_stk, CPU->reg[CPU->code[CPU->IP + 1]]);
                 CPU->IP += 2;
                 break;
             }

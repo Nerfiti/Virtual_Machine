@@ -55,14 +55,46 @@ void execute_ASM(Text input_data, bool first_assemble)
 
         if (stricmp(cmd, cmds[CMD_PUSH]) == 0)
         {
-            int value = 0;
-            sscanf(input_data.lines[line].start + position, "%d", &value);
+            char arg[maximum_cmd_length] = "";
+            sscanf(input_data.lines[line].start + position, "%s", arg);
+            if (stricmp(arg, "RAX") == 0)
+            {
+                code[IP] = CMD_PUSH | 1<<5;
+                code[IP + 1] = RAX;
+                IP += 2;
+                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RAX", CMD_PUSH, RAX);
+            }
+            else if (stricmp(arg, "RBX") == 0)
+            {
+                code[IP] = CMD_PUSH | 1<<5;
+                code[IP + 1] = RBX;
+                IP += 2;
+                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RBX", CMD_PUSH, RBX);
+            }
+            else if (stricmp(arg, "RCX") == 0)
+            {
+                code[IP] = CMD_PUSH | 1<<5;
+                code[IP + 1] = RCX;
+                IP += 2;
+                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RCX", CMD_PUSH, RCX);
+            }
+            else if (stricmp(arg, "RDX") == 0)
+            {
+                code[IP] = CMD_PUSH | 1<<5;
+                code[IP + 1] = RDX;
+                IP += 2;
+                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RDX", CMD_PUSH, RDX);
+            }
+            else
+            {
+                code[IP] = CMD_PUSH;
+                int value = 0;
+                sscanf(input_data.lines[line].start + position, "%d", &value);
+                fprintf(listing_file, "%s %-11d | %d %-11d\n", cmds[CMD_PUSH], value, CMD_PUSH, value);
+                code[IP + 1] = value;
+                IP += 2;
+            }
 
-            fprintf(listing_file, "%s %-11d | %d %-11d\n", cmds[CMD_PUSH], value, CMD_PUSH, value);
-
-            code[IP] = CMD_PUSH;
-            code[IP + 1] = value;
-            IP += 2;
         }
         else if (stricmp(cmd, cmds[CMD_ADD]) == 0)
         {

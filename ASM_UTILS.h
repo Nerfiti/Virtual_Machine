@@ -25,6 +25,14 @@ struct ASM_t
     int index = 0;
 };
 
+enum 
+{
+    RAX = 1,
+    RBX = 2,
+    RCX = 3,
+    RDX = 4
+};
+
 
 
 void init_ASM(Text *input_data);
