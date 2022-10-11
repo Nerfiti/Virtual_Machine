@@ -13,6 +13,13 @@ extern const char *input_filename;
 extern const char *listing_filename;
 extern const char *out_bin_filename;
 
+struct label
+{
+    int value = 0;
+    char *name = nullptr;    
+};
+
+
 void init_ASM(Text *input_data);
 void execute_ASM(Text input_data);
 

@@ -5,6 +5,8 @@ const Header head = {};
 const char *input_filename    = "Input.txt";
 const char *listing_filename  = "Listing.txt";
 const char *out_bin_filename  = "code_machine.bin";
+const int   label_arr_size    = 100;
+label l_arr[label_arr_size]   = {};
 
 void init_ASM(Text *input_data)
 {
@@ -14,6 +16,7 @@ void init_ASM(Text *input_data)
     file_to_memory(input_file, input_data);
     text_to_lines (input_data);
 }
+
 
 void execute_ASM(Text input_data)
 {
