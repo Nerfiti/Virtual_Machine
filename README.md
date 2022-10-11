@@ -44,20 +44,34 @@ The file must consist of valid commands, located on separate lines. If the comma
 
 Valid commands (with their numbers in the machine code):
 
-1 = PUSH [one argument] -- push number-argument on the CPU stack
+1  = PUSH [one argument] -- push number-argument on the CPU stack
 
-2 = ADD                 -- adds       the top 2 numbers from the stack
+2  = ADD                 -- adds the top 2 numbers from the stack
 
-3 = SUB                 -- subtracts  the top number of the stack from the penultimate one
+3  = SUB                 -- subtracts the top number of the stack from the penultimate one
 
-4 = MUL                 -- multiplies the top 2 numbers from the stack
+4  = MUL                 -- multiplies the top 2 numbers from the stack
 
-5 = DIV                 -- divides    the penultimate number in the stack by the top number of the stack
+5  = DIV                 -- divides the penultimate number in the stack by the top number of the stack
 
-6 = OUT                 -- prints the top number of the stack to a file "Result.txt"
+6  = DUP                 -- duplicate last stack element
 
-7 = JMP [ont argument]  -- jump to mark-argument
+7  = OUT                 -- prints the top number of the stack to a file "Result.txt"
 
-7 = HLT                 -- terminates the CPU
+8  = JMP [one argument]  -- jump to mark-argument
+
+9  = JB [one argument]   -- jump to mark-argument if penultimate stack element <  last one
+
+10 = JBE [one argument]  -- jump to mark-argument if penultimate stack element <= last one
+
+11 = JA [one argument]   -- jump to mark-argument if penultimate stack element >  last one
+
+12 = JAE [one argument]  -- jump to mark-argument if penultimate stack element >= last one
+
+13 = JE [one argument]   -- jump to mark-argument if penultimate stack element == last one
+
+14 = JNE [one argument]  -- jump to mark-argument if penultimate stack element != last one
+
+15 = HLT                 -- terminates the CPU
 
 ---------------------------------------------------------------------------------------------
