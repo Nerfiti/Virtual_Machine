@@ -60,15 +60,15 @@ Valid commands (with their numbers in the machine code):
 
 8  = JMP [one argument]  -- jump to mark-argument
 
-9  = JB [one argument]   -- jump to mark-argument if penultimate stack element <  last one
+9  = JB  [one argument]   -- jump to mark-argument if penultimate stack element <  last one
 
 10 = JBE [one argument]  -- jump to mark-argument if penultimate stack element <= last one
 
-11 = JA [one argument]   -- jump to mark-argument if penultimate stack element >  last one
+11 = JA  [one argument]   -- jump to mark-argument if penultimate stack element >  last one
 
 12 = JAE [one argument]  -- jump to mark-argument if penultimate stack element >= last one
 
-13 = JE [one argument]   -- jump to mark-argument if penultimate stack element == last one
+13 = JE  [one argument]   -- jump to mark-argument if penultimate stack element == last one
 
 14 = JNE [one argument]  -- jump to mark-argument if penultimate stack element != last one
 
