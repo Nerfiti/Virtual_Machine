@@ -56,6 +56,8 @@ Valid commands (with their numbers in the machine code):
 
 6 = OUT                 -- prints the top number of the stack to a file "Result.txt"
 
+7 = JMP [ont argument]  -- jump to mark-argument
+
 7 = HLT                 -- terminates the CPU
 
 ---------------------------------------------------------------------------------------------
