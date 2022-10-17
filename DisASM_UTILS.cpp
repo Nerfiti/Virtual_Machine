@@ -1,6 +1,6 @@
 #include "DisASM_UTILS.h"
 
-const int   version_CPU     = 4;
+const int   version_CPU     = 6;
 const char *input_filename  = "./Code_machine.bin";
 const char *output_filename = "./DisASM Result.txt";
 
@@ -83,6 +83,12 @@ void execute_ASM(DisASM *disasm)
                     printf("Error: non-existent register");
                     break;
                 }
+                disasm->IP += 2;
+                break;
+            }
+            case CMD_PUSH | 1 << 6:
+            {
+                fprintf(DisASM_result, "PUSH [%p]\n", disasm->code[disasm->IP + 1]);
                 disasm->IP += 2;
                 break;
             }

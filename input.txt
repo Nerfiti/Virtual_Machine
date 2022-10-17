@@ -1,33 +1,14 @@
 push 1
+push 2
+pop RBX
+pop [RBX]
 push RAX
-push RBX
-push RCX
-push RDX
-out
-out
-out
-out
 push 1
-dup
-add
-dup
-for:
-push 21
-out
-add
-dup
-dup
-push 16
-ja jump:
-jmp for:
-push 3
-add
-sub
-push 100
 mul
-jump:
-push 10
-push 5
+push RBX
 add
+push [0+RBX]
+div
 out
 hlt
+

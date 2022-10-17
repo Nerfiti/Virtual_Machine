@@ -15,15 +15,17 @@ extern const char *input_filename;
 extern const char *output_filename;
 
 const int number_of_registers = 5;
+const int size_of_ram         = 262144;
 
 struct SoftCPU
 {
-    Header *head      = nullptr;
-    int *code         = nullptr;
-    int IP            = 0;
-    stack_id main_stk = 0;
-    FILE *result      = nullptr;
+    Header *head                 = nullptr;
+    int *code                    = nullptr;
+    int IP                       = 0;
+    stack_id main_stk            = 0;
+    FILE *result                 = nullptr;
     int reg[number_of_registers] = {};
+    int ram[size_of_ram]         = {};
 };
 
 void init_CPU   (SoftCPU *CPU);

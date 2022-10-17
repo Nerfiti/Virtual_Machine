@@ -3,12 +3,12 @@
 
 static const int maximum_cmd_length = 10;
 static const int signature_length   = 12;
-static const int num_cmds           = 15;
+static const int num_cmds           = 16;
 
 struct Header
 {
     const char signature[signature_length] = "PDA";
-    const int  version                      = 4;
+    const int  version                      = 6;
 };
 
 enum cmd
@@ -27,7 +27,8 @@ enum cmd
     CMD_JAE  = 12,
     CMD_JE   = 13,
     CMD_JNE  = 14,
-    CMD_HLT  = 15
+    CMD_POP  = 15,
+    CMD_HLT  = 16
 };
 
 const char cmds[num_cmds + 1][maximum_cmd_length + 1] = 
@@ -47,6 +48,7 @@ const char cmds[num_cmds + 1][maximum_cmd_length + 1] =
     "JAE",
     "JE",
     "JNE",
+    "POP",
     "HLT"
 };
 

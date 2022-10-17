@@ -25,7 +25,7 @@ struct ASM_t
     int index = 0;
 };
 
-enum 
+enum Regs
 {
     RAX = 1,
     RBX = 2,
@@ -33,10 +33,16 @@ enum
     RDX = 4
 };
 
+enum Cmdmode
+{
+    With_RAM = 1 << 30,
+    With_REG = 1 << 29
+};
 
 
 void init_ASM(Text *input_data);
 void execute_ASM(Text input_data, bool first_assemble);
 int SearchName(char *name);
+int ProcessingArgsAndGetMode(char *args_line, int *args);
 
 #endif //ASM_UTILS_H

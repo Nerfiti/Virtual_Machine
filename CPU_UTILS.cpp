@@ -1,6 +1,6 @@
 #include "CPU_UTILS.h"
 
-const int   version_CPU         = 4;
+const int   version_CPU         = 6;
 const char *input_filename      = "./Code_machine.bin";
 const char *output_filename     = "./Result.txt";
 
@@ -56,6 +56,13 @@ void execute_CPU(SoftCPU *CPU)
             case CMD_PUSH | 1<<5:
             {
                 StackPush(CPU->main_stk, CPU->reg[CPU->code[CPU->IP + 1]]);
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_PUSH | 1<<6:
+            {
+                printf("\n*\n");
+                StackPush(CPU->main_stk, CPU->ram[CPU->code[CPU->IP + 1]]);
                 CPU->IP += 2;
                 break;
             }
@@ -176,6 +183,21 @@ void execute_CPU(SoftCPU *CPU)
                 {
                     CPU->IP = CPU->code[CPU->IP + 1] - 2;
                 }
+                CPU->IP += 2;
+                break;
+            }
+            case CMD_POP | 1 << 5:
+            {
+                StackPop(CPU->main_stk, &a);
+                CPU->reg[CPU->code[CPU->IP + 1]] = a;
+                CPU->IP += 2;
+                break;
+
+            }
+            case CMD_POP | 1 << 6:
+            {
+                StackPop(CPU->main_stk, &a);
+                CPU->ram[CPU->code[CPU->IP + 1]] = a;
                 CPU->IP += 2;
                 break;
             }
