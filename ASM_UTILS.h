@@ -27,18 +27,11 @@ struct ASM_t
 
 enum Regs
 {
-    RAX = 1,
-    RBX = 2,
-    RCX = 3,
-    RDX = 4
-};
-
-enum Cmdmode
-{
-    Without_special_args = 0,
-    With_RAM             = 1 << 28,
-    With_REG             = 1 << 29,
-    With_PLUS            = 1 << 30
+    Wrong_Reg = -1,
+    RAX       =  1,
+    RBX       =  2,
+    RCX       =  3,
+    RDX       =  4
 };
 
 
@@ -47,5 +40,10 @@ void execute_ASM(Text input_data, bool first_assemble);
 int  SearchName(char *name);
 int  ProcessingArgsAndGetMode(char *args_line, int *args, int *argc);
 void PrintListing(FILE *listingfile, char *asm_line, int *code, int argc);
+void PrintHeader(FILE* listing_file, Header head);
+void DelComment(char *line, char comm_symbol);
+void SetLabel(char *command, int IP);
+void PrintCode(FILE *out_bin, Header head, int *code, int code_len);
+int GetRegNum(char *reg_name);
 
 #endif //ASM_UTILS_H

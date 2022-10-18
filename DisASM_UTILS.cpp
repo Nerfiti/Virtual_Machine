@@ -23,16 +23,7 @@ void init_ASM(DisASM *disasm)
     disasm->code     = (int *)(data + 1);
     disasm->IP       = 0;
 
-    if (strcmp(disasm->head->signature, "PDA"))
-    {
-        printf("Wrong signature!");
-        abort;
-    }
-    if (disasm->head->version != version_CPU)
-    {
-        printf("Wrong program version!");
-        abort;
-    }
+    CheckHead(*disasm->head);
 }
 
 void execute_ASM(DisASM *disasm)
@@ -41,133 +32,120 @@ void execute_ASM(DisASM *disasm)
     
     fprintf(DisASM_result, "%s %d\n", disasm->head->signature, disasm->head->version);
 
+    #define IP        disasm->IP
+    #define CMD       disasm->code[IP]
+    #define ARG(n)    disasm->code[IP + n]
+
     while(true)
     {
         int a = 0,
             b = 0;
-
-        switch(disasm->code[disasm->IP])
+        switch(CMD & cmd_id_mask)
         {
             case CMD_PUSH:
-            {
-                fprintf(DisASM_result, "PUSH %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
-                break;
-            }
-            case CMD_PUSH | 1<<5:
-            {
-                fprintf(DisASM_result, "PUSH ");
-                switch (disasm->code[disasm->IP + 1])
+            {   
+               if ((CMD & With_RAM) && (CMD & With_REG) && (CMD & With_PLUS))
                 {
-                case 1:
-                {
-                    fprintf(DisASM_result, "RAX\n");
-                    break;
-                } 
-                case 2:
-                {
-                    fprintf(DisASM_result, "RBX\n");
-                    break;
+                    fprintf(DisASM_result, "PUSH [%d+%s]\n", ARG(1), regs[ARG(2)]);
+                    IP++;
                 }
-                case 3:
-                {
-                    fprintf(DisASM_result, "RCX\n");
-                    break;
-                }
-                case 4:
-                {
-                    fprintf(DisASM_result, "RDX\n");
-                    break;
-                }
-                default:
-                    printf("Error: non-existent register");
-                    break;
-                }
-                disasm->IP += 2;
-                break;
-            }
-            case CMD_PUSH | 1 << 6:
-            {
-                fprintf(DisASM_result, "PUSH [%p]\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                else if ((CMD & With_RAM) && (CMD & With_REG)) fprintf(DisASM_result, "PUSH [%s]\n", regs[ARG(1)]);
+                else if ( CMD & With_RAM)                      fprintf(DisASM_result, "PUSH [%d]\n", ARG(1));
+                else if ( CMD & With_REG)                      fprintf(DisASM_result, "PUSH %s \n", regs[ARG(1)]);
+                else                                           fprintf(DisASM_result, "PUSH %d \n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_ADD:
             {
                 fprintf(DisASM_result, "ADD\n");
-                disasm->IP++;
+                IP++;
                 break;
             }
             case CMD_SUB:
             {
                 fprintf(DisASM_result, "SUB\n");
-                disasm->IP++;
+                IP++;
                 break;
             }
             case CMD_MUL:
             {
                 fprintf(DisASM_result, "MUL\n");
-                disasm->IP++;
+                IP++;
                 break;
             }
             case CMD_DIV:
             {
                 fprintf(DisASM_result, "DIV\n");
-                disasm->IP++;
+                IP++;
                 break;
             }
             case CMD_DUP:
             {
                 fprintf(DisASM_result, "DUP\n");
-                disasm->IP++;
+                IP++;
                 break;
             }
             case CMD_OUT:
             {
                 fprintf(DisASM_result, "OUT\n");
-                disasm->IP++;
+                IP++;
                 break;
             }
             case CMD_JMP:
             {
-                fprintf(DisASM_result, "JMP %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JMP %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_JB:
             {
-                fprintf(DisASM_result, "JB %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JB %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_JBE:
             {
-                fprintf(DisASM_result, "JBE %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JBE %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_JA:
             {
-                fprintf(DisASM_result, "JA %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JA %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_JAE:
             {
-                fprintf(DisASM_result, "JAE %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JAE %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_JE:
             {
-                fprintf(DisASM_result, "JE %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JE %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_JNE:
             {
-                fprintf(DisASM_result, "JNE %d\n", disasm->code[disasm->IP + 1]);
-                disasm->IP += 2;
+                fprintf(DisASM_result, "JNE %d\n", ARG(1));
+                IP += 2;
+                break;
+            }
+            case CMD_POP:
+            {
+                if ((CMD & With_RAM) && (CMD & With_REG) && (CMD & With_PLUS))
+                {
+                    fprintf(DisASM_result, "POP [%d+%s]\n", ARG(1), regs[ARG(2)]);
+                    IP++;
+                }
+                else if ((CMD & With_RAM) && (CMD & With_REG)) fprintf(DisASM_result, "POP [%s]\n", regs[ARG(1)]);
+                else if ( CMD & With_RAM)                      fprintf(DisASM_result, "POP [%d]\n", ARG(1));
+                else if ( CMD & With_REG)                      fprintf(DisASM_result, "POP %s \n", regs[ARG(1)]);
+                else                                           fprintf(DisASM_result, "POP %d \n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_HLT:
@@ -178,10 +156,26 @@ void execute_ASM(DisASM *disasm)
             }
             default:
             {
-                fprintf(DisASM_result, "Error. Non-existent command: %d\n", disasm->code[disasm->IP]);
+                fprintf(DisASM_result, "Error. Non-existent command: %d\n", CMD);
                 assert(!fclose(DisASM_result));
                 return;
             }
         }
+    }
+
+    #undef DEF_CMD
+}
+
+void CheckHead(Header head)
+{
+    if (strcmp(head.signature, "PDA"))
+    {
+        printf("Wrong signature!");
+        abort();
+    }
+    if (head.version != version_CPU)
+    {
+        printf("Wrong program version!");
+        abort();
     }
 }

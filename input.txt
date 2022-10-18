@@ -1,14 +1,9 @@
-push 1
-push 2
-pop RBX
-pop [RBX]
-push RAX
-push 1
+push 10
+push 5
+pop RAX
+pop [6]
+push 15
+push [RAX+1]
 mul
-push RBX
-add
-push [0+RBX]
-div
 out
 hlt
-

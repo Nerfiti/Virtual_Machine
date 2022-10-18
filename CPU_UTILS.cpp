@@ -26,192 +26,57 @@ void init_CPU(SoftCPU *CPU)
     CPU->result   = fopen(output_filename, "w");
     assert(CPU->result);
 
-    if (strcmp(CPU->head->signature, "PDA"))
-    {
-        printf("Wrong signature!");
-        abort();
-    }
-    if (CPU->head->version != version_CPU)
-    {
-        printf("Wrong program version!");
-        abort();
-    }
+    CheckHead(*CPU->head);
 }
 
 void execute_CPU(SoftCPU *CPU)
 {
+
+    #define STACK     CPU->main_stk
+    #define POP(val)  StackPop(STACK, val)
+    #define PUSH(val) StackPush(STACK, val)
+    #define IP        CPU->IP
+    #define CMD       CPU->code[IP]
+    #define ARG(n)    CPU->code[IP + n]
+    #define REG(n)    CPU->reg[n]
+    #define RAM(n)    CPU->ram[n]
+
+    #define DEF_CMD(cmd, num, code) \
+        case num:                   \
+        {                           \
+            code                    \
+            break;                  \
+        }                           \
+
     while(true)
     {
-        int a = 0,
-            b = 0;
-        
-        switch(CPU->code[CPU->IP])
+        int first_operand  = 0,
+            second_operand = 0;
+            
+        switch(CMD & cmd_id_mask)
         {
-            case CMD_PUSH:
-            {
-                StackPush(CPU->main_stk, CPU->code[CPU->IP + 1]);
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_PUSH | 1<<5:
-            {
-                StackPush(CPU->main_stk, CPU->reg[CPU->code[CPU->IP + 1]]);
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_PUSH | 1<<6:
-            {
-                printf("\n*\n");
-                StackPush(CPU->main_stk, CPU->ram[CPU->code[CPU->IP + 1]]);
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_ADD:
-            {
-                StackPop (CPU->main_stk, &a);
-                StackPop (CPU->main_stk, &b);
-                StackPush(CPU->main_stk, a + b);
-                CPU->IP++;
-                break;
-            }
-            case CMD_SUB:
-            {
-                StackPop (CPU->main_stk, &a);
-                StackPop (CPU->main_stk, &b);
-                StackPush(CPU->main_stk, b - a);
-                CPU->IP++;
-                break;
-            }
-            case CMD_MUL:
-            {
-                StackPop (CPU->main_stk, &a);
-                StackPop (CPU->main_stk, &b);
-                StackPush(CPU->main_stk, a * b);
-                CPU->IP++;
-                break;
-            }
-            case CMD_DIV:
-            {
-                StackPop(CPU->main_stk, &a);
-                StackPop(CPU->main_stk, &b);
-                assert(a != 0);
-                StackPush(CPU->main_stk, b / a);
-                CPU->IP++;
-                break;
-            }
-            case CMD_DUP:
-            {
-                StackPop (CPU->main_stk, &a);
-                StackPush(CPU->main_stk,  a);
-                StackPush(CPU->main_stk,  a);
-                CPU->IP++;
-                break;
-            }
-            case CMD_OUT:
-            {
-                StackPop(CPU->main_stk, &a);
-                printf("Value: %d\n", a);
-                fprintf(CPU->result, "Result = %d\n", a);
-                CPU->IP++;
-                break;
-            }
-            case CMD_JMP:
-            {
-                CPU->IP = CPU->code[CPU->IP + 1];
-                break;
-            }
-            case CMD_JB:
-            {
-                StackPop(CPU->main_stk, &b);
-                StackPop(CPU->main_stk, &a);
-                if (a < b)
-                {
-                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
-                }
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_JBE:
-            {
-                StackPop(CPU->main_stk, &b);
-                StackPop(CPU->main_stk, &a);
-                if (a <= b)
-                {
-                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
-                }
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_JA:
-            {
-                StackPop(CPU->main_stk, &b);
-                StackPop(CPU->main_stk, &a);
-                if (a > b)
-                {
-                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
-                }
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_JAE:
-            {
-                StackPop(CPU->main_stk, &b);
-                StackPop(CPU->main_stk, &a);
-                if (a >= b)
-                {
-                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
-                }
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_JE:
-            {
-                StackPop(CPU->main_stk, &b);
-                StackPop(CPU->main_stk, &a);
-                if (a == b)
-                {
-                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
-                }
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_JNE:
-            {
-                StackPop(CPU->main_stk, &b);
-                StackPop(CPU->main_stk, &a);
-                if (a != b)
-                {
-                    CPU->IP = CPU->code[CPU->IP + 1] - 2;
-                }
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_POP | 1 << 5:
-            {
-                StackPop(CPU->main_stk, &a);
-                CPU->reg[CPU->code[CPU->IP + 1]] = a;
-                CPU->IP += 2;
-                break;
-
-            }
-            case CMD_POP | 1 << 6:
-            {
-                StackPop(CPU->main_stk, &a);
-                CPU->ram[CPU->code[CPU->IP + 1]] = a;
-                CPU->IP += 2;
-                break;
-            }
-            case CMD_HLT:
-            {
-                assert(!fclose(CPU->result));
-                return;
-            }
+            #include "cmds.h"
             default:
             {
-                printf("Error. Non-existent command: %d\n", CPU->code[CPU->IP]);
+                printf("Error. Non-existent command: %d\n", CMD);
                 assert(!fclose(CPU->result));
                 return;
             }
         }
+    }
+    #undef DEF_CMD
+}
+
+void CheckHead(Header head)
+{
+    if (strcmp(head.signature, "PDA"))
+    {
+        printf("Wrong signature!");
+        abort();
+    }
+    if (head.version != version_CPU)
+    {
+        printf("Wrong program version!");
+        abort();
     }
 }

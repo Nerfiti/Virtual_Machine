@@ -30,5 +30,6 @@ struct SoftCPU
 
 void init_CPU   (SoftCPU *CPU);
 void execute_CPU(SoftCPU *CPU);
+void CheckHead  (Header head);
 
 #endif //CPU_UTIL_H

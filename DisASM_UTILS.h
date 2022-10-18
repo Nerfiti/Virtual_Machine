@@ -22,5 +22,6 @@ struct DisASM
 
 void init_ASM   (DisASM *disasm);
 void execute_ASM(DisASM *disasm);
+void CheckHead  (Header head);
 
 #endif //DISASM_UTILS_H
