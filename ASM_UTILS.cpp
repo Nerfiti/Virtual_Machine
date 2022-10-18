@@ -51,106 +51,28 @@ void execute_ASM(Text input_data, bool first_assemble)
             comment[1] = '\0';
         }
         char arg[maximum_cmd_length] = "";
-        sscanf(input_data.lines[line].start, "%s%n %s", cmd, &position, arg);
+        char *string = input_data.lines[line].start;
+        sscanf(string, "%s%n %s", cmd, &position, arg);
 
         if (stricmp(cmd, cmds[CMD_PUSH]) == 0)
         {
-            if (strchr(arg, '[') && strchr(arg, ']'))
-            {
-                code[IP] = CMD_PUSH | 1 << 6;
-                int value = 0;
-                sscanf(arg, "%*[[]%d", &value);
-                fprintf(listing_file, "%s[0x%7p] | %d %-11d\n", cmds[CMD_PUSH], value, CMD_PUSH, value);
-                code[IP + 1] = value;
-                IP += 2;
-            }
-            else if (stricmp(arg, "RAX") == 0)
-            {
-                code[IP] = CMD_PUSH | 1<<5;
-                code[IP + 1] = RAX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RAX", CMD_PUSH, RAX);
-            }
-            else if (stricmp(arg, "RBX") == 0)
-            {
-                code[IP] = CMD_PUSH | 1<<5;
-                code[IP + 1] = RBX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RBX", CMD_PUSH, RBX);
-            }
-            else if (stricmp(arg, "RCX") == 0)
-            {
-                code[IP] = CMD_PUSH | 1<<5;
-                code[IP + 1] = RCX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RCX", CMD_PUSH, RCX);
-            }
-            else if (stricmp(arg, "RDX") == 0)
-            {
-                code[IP] = CMD_PUSH | 1<<5;
-                code[IP + 1] = RDX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s | %d %-11d\n", cmds[CMD_PUSH], "RDX", CMD_PUSH, RDX);
-            }
-            else
-            {
-                code[IP] = CMD_PUSH;
-                int value = 0;
-                sscanf(input_data.lines[line].start + position, "%d", &value);
-                fprintf(listing_file, "%s %-11d | %d %-11d\n", cmds[CMD_PUSH], value, CMD_PUSH, value);
-                code[IP + 1] = value;
-                IP += 2;
-            }
+            int argc = 0;
+            int mode = ProcessingArgsAndGetMode(string + position, code + IP + 1, &argc);
+            code[IP] = CMD_PUSH | mode;
 
+            PrintListing(listing_file, string, code + IP, argc + 1);
+
+            IP += argc + 1;
         }
         if (stricmp(cmd, cmds[CMD_POP]) == 0)
         {
-            if (strchr(arg, '[') && strchr(arg, ']'))
-            {
-                code[IP] = CMD_POP | 1 << 6;
-                int value = 0;
-                sscanf(arg, "%*[[]%d", &value);
-                fprintf(listing_file, "%s[0x%p]  | %d %-11d\n", cmds[CMD_POP], value, CMD_POP, value);
-                code[IP + 1] = value;
-                IP += 2;
-            }
-            else if (stricmp(arg, "RAX") == 0)
-            {
-                code[IP] = CMD_POP | 1<<5;
-                code[IP + 1] = RAX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s  | %d %-11d\n", cmds[CMD_POP], "RAX", CMD_POP, RAX);
-            }
-            else if (stricmp(arg, "RBX") == 0)
-            {
-                code[IP] = CMD_POP | 1<<5;
-                code[IP + 1] = RBX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s  | %d %-11d\n", cmds[CMD_POP], "RBX", CMD_POP, RBX);
-            }
-            else if (stricmp(arg, "RCX") == 0)
-            {
-                code[IP] = CMD_POP | 1<<5;
-                code[IP + 1] = RCX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s  | %d %-11d\n", cmds[CMD_POP], "RCX", CMD_POP, RCX);
-            }
-            else if (stricmp(arg, "RDX") == 0)
-            {
-                code[IP] = CMD_POP | 1<<5;
-                code[IP + 1] = RDX;
-                IP += 2;
-                fprintf(listing_file, "%s %-11s  | %d %-11d\n", cmds[CMD_POP], "RDX", CMD_POP, RDX);
-            }
-            else
-            {
-                code[IP] = CMD_POP;
-                int value = 0;
-                sscanf(input_data.lines[line].start + position, "%d", &value);
-                fprintf(listing_file, "%s %-11d  | %d %-11d\n", cmds[CMD_POP], value, CMD_POP, value);
-                code[IP + 1] = value;
-                IP += 2;
-            }
+            int argc = 0;
+            int mode = ProcessingArgsAndGetMode(string + position, code + IP + 1, &argc);
+            code[IP] = CMD_POP | mode;
+
+            PrintListing(listing_file, string, code + IP, argc + 1);
+
+            IP += argc + 1;
         }
         else if (stricmp(cmd, cmds[CMD_ADD]) == 0)
         {
@@ -326,7 +248,7 @@ void execute_ASM(Text input_data, bool first_assemble)
         }
         line++;
     }
-
+    
     fwrite(&head, sizeof(char), sizeof(Header)  , out_bin);
     fwrite(code , sizeof(char), IP * sizeof(int), out_bin);
 
@@ -346,65 +268,153 @@ int SearchName(char *name)
     return -1;
 }
 
-int ProcessingArgsAndGetMode(char *args_line, int *args)
+int ProcessingArgsAndGetMode(char *args_line, int *args, int *argc)
 {
-    int   regnum = -1;
-    int   ramnum = -1;
-    int   mode   = 0;
-    char *reg    = nullptr;
+    int   regnum    = -1;
+    int   ramnum    = -1;
+    char *reg_start = nullptr;
+    char *ram_start = nullptr;
 
-    if (strchr(args_line, '['))
+    if (ram_start = strchr(args_line, '['))
     {
-        mode |= With_RAM;
+        if (strchr(ram_start, '+'))
+        {
+            const int max_arg_len  = 50;
+            char farg[max_arg_len] = "",
+                 sarg[max_arg_len] = "";
 
-        int farg = 0,
-            sarg = 0;
-        sscanf(args_line, "%[[]%d+%d]", farg, sarg);
+            sscanf(ram_start, "%[^+] + %[^]]", farg, sarg);
 
-        ramnum = farg + sarg;
-    }
-    if (reg = strchr(args_line, 'R'))
-    {
-        mode |= With_REG;
+            if (*farg != 'R')
+            {
+                args[0] = atoi(farg);
+                if      (stricmp(sarg, "RAX"))
+                {
+                    args[1] = RAX;
+                }
+                else if (stricmp(sarg, "RBX"))
+                {
+                    args[1] = RBX;
+                }
+                else if (stricmp(sarg, "RCX"))
+                {
+                    args[1] = RCX;
+                }
+                else if (stricmp(sarg, "RDX"))
+                {
+                    args[1] = RDX;
+                }
+                else
+                {
+                    printf("Syntax Error: Wrong Register Name. %s\n", sarg);
+                }
+            }
 
-        if (stricmp(reg, "RAX") == 0)
-        {
-            regnum = 1;
-        }
-        else if (stricmp(reg, "RBX") == 0)
-        {
-            regnum = 2;
-        }
-        else if (stricmp(reg, "RCX") == 0)
-        {
-            regnum = 3;
-        }
-        else if (stricmp(reg, "RDX") == 0)
-        {
-            regnum = 4;
+            if (*sarg != 'R')
+            {
+                args[0] = atoi(sarg);
+                if      (stricmp(farg, "RAX"))
+                {
+                    args[1] = RAX;
+                }
+                else if (stricmp(farg, "RBX"))
+                {
+                    args[1] = RBX;
+                }
+                else if (stricmp(farg, "RCX"))
+                {
+                    args[1] = RCX;
+                }
+                else if (stricmp(farg, "RDX"))
+                {
+                    args[1] = RDX;
+                }
+                else
+                {
+                    printf("Syntax Error: Wrong Register Name. %s\n", sarg);
+                }
+            }
+            *argc = 2;
+            return With_REG | With_RAM | With_PLUS;
         }
         else
         {
-            printf("Syntax Error: Wrong name of register\n");
+            const int max_arg_len  = 50;
+            char arg[max_arg_len]  = "";
+
+            sscanf(ram_start, "[%[^]]", arg);
+
+            if (*arg != 'R')
+            {
+                args[0] = atoi(arg);
+                *argc = 1;
+                return With_RAM;
+            }
+
+            if (stricmp(arg, "RAX") == 0)
+            {
+                args[1] = RAX;
+            }
+            else if (stricmp(arg, "RBX") == 0)
+            {
+                args[1] = RBX;
+            }
+            else if (stricmp(arg, "RCX") == 0)
+            {
+                args[1] = RCX;
+            }
+            else if (stricmp(arg, "RDX") == 0)
+            {
+                args[1] = RDX;
+            }
+            else
+            {
+                printf("Syntax Error: Wrong Register Name. %s\n", arg);
+            }
+            *argc = 1;
+            return With_REG;
+        }
+    }
+    else if (reg_start = strchr(args_line, 'R'))
+    {
+        *argc = 1;
+        if (strnicmp(reg_start, "RAX", 3) == 0)
+        {
+            args[0] = RAX;
+            return With_REG;
+        }
+        else if (strnicmp(reg_start, "RBX", 3) == 0)
+        {
+            args[0] = RBX;
+            return With_REG;
+        }
+        else if (strnicmp(reg_start, "RCX", 3) == 0)
+        {
+            args[0] = RCX;
+            return With_REG;
+        }
+        else if (strnicmp(reg_start, "RDX", 3) == 0)
+        {
+            args[0] = RDX;
+            return With_REG;
+        }
+        else
+        {
+            printf("Syntax Error: Wrong name of register: %s\n", reg_start);
             abort();
         }
     }
-    if (mode & With_RAM && mode & With_REG)
+    *argc = sscanf(args_line, "%d", args);
+    return Without_special_args;
+}
+
+void PrintListing(FILE* listing_file, char *asm_line, int *code, int argc)
+{
+    fprintf(listing_file, "%-20s |", asm_line);
+
+    for (int i = 0; i < argc; ++i)
     {
-        args[0] = ramnum;
-        args[1] = regnum;
+        fprintf(listing_file, "%d ", code[i]);
     }
-    else if (mode & With_REG)
-    {
-        args[0] = regnum;
-    }
-    else if (mode & With_RAM)
-    {
-        args[0] = ramnum;
-    }
-    else
-    {
-        sscanf(args_line, "%d", args);
-    }
-    return mode;
+    fprintf(listing_file, "\n");
 }

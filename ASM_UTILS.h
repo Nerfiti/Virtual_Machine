@@ -35,14 +35,17 @@ enum Regs
 
 enum Cmdmode
 {
-    With_RAM = 1 << 30,
-    With_REG = 1 << 29
+    Without_special_args = 0,
+    With_RAM             = 1 << 28,
+    With_REG             = 1 << 29,
+    With_PLUS            = 1 << 30
 };
 
 
 void init_ASM(Text *input_data);
 void execute_ASM(Text input_data, bool first_assemble);
-int SearchName(char *name);
-int ProcessingArgsAndGetMode(char *args_line, int *args);
+int  SearchName(char *name);
+int  ProcessingArgsAndGetMode(char *args_line, int *args, int *argc);
+void PrintListing(FILE *listingfile, char *asm_line, int *code, int argc);
 
 #endif //ASM_UTILS_H
