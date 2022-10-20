@@ -8,6 +8,7 @@
 
 #include "Comp_Generals.h"
 #include "linesLib.h"
+
 #include "stack.h"
 
 extern const int   version_CPU;
@@ -26,10 +27,12 @@ struct SoftCPU
     FILE *result                 = nullptr;
     int reg[number_of_registers] = {};
     int ram[size_of_ram]         = {};
+    stack_id ret_stk             = 0;
 };
 
 void init_CPU   (SoftCPU *CPU);
 void execute_CPU(SoftCPU *CPU);
 void CheckHead  (Header head);
+void SegFault   ();
 
-#endif //CPU_UTIL_H
+#endif //CPU_UTILS_H

@@ -3,8 +3,11 @@
 typedef long long CANARY_t;
 typedef unsigned long long Hash;
 
-const int factor                    = 2;
-const CANARY_t CANARY               = 0xFEEEB1ED;
+const int      factor          =  2;
+const size_t   STD_CAPACITY    =  10;
+const CANARY_t CANARY          =  0xFEEEB1ED;
+const elem_t   STD_POISON      = -0x4FFFFFFF;
+const int      max_err_msg_len = 24;
 
 struct stack
 {
@@ -19,10 +22,24 @@ struct stack
     CANARY_t RightCanary  = CANARY;
 };
 
-static unsigned long long GenHash         (void *memptr, size_t size_of_memblock);
-static int                StackResize_UP  (stack_id stk_id                      );
-static int                StackResize_DOWN(stack_id stk_id                      );
-static int                bin             (int number                           );
+static unsigned long long GenHash(void *memptr, size_t size_of_memblock);
+static void StackResize_UP(stack_id stk_id);
+static void StackResize_DOWN(stack_id stk_id);
+static elem_t *GetNewDataPtr(stack *stk, size_t new_size);
+static void FillPoison(stack *stk);
+static void ReHash(stack *stk);
+
+#define REPORT(stk, err)                                         \
+        if (err)                                                 \
+        {                                                        \
+            const char* msg = nullptr;                           \
+            getErrMsg(err, &msg);                                \
+            printf("\nStack Error: %d (%s). In function %s.\n",  \
+                                  err, msg, __PRETTY_FUNCTION__);\
+            StackDump(stk);                                      \
+            ABORT_ON(abort());                                   \
+            return err;                                          \
+        }
 
 int SetBirds(stack_id stk_id)
 {
@@ -40,10 +57,12 @@ int SetBirds(stack_id stk_id)
 
 int StackCtor(stack_id *stk_id_ptr, size_t capacity, elem_t POISON)
 {
+    assert(stk_id_ptr);
+
     if (capacity < 1 || capacity >= __SIZE_MAX__ / sizeof(elem_t) - 2*sizeof(CANARY_t))
     {
-        *stk_id_ptr = (stack_id)JUST_FREE_PTR;
-        return WRONG_CAPACITY;
+        printf("Stack Error (StackCtor): Wrong capacity: %llu", capacity);
+        ABORT_ON(abort());
     }
     
     stack *stk          = (stack *)calloc(sizeof(stack), 1);
@@ -54,81 +73,72 @@ int StackCtor(stack_id *stk_id_ptr, size_t capacity, elem_t POISON)
     stk->capacity       = capacity;
     stk->start_capacity = capacity;
     stk->POISON         = POISON;
-    stk->STACK_HASH     = GenHash((CANARY_t *)stk + 1, sizeof(stack)-2*sizeof(CANARY_t)-2*sizeof(Hash));
     stk->RightCanary    = CANARY;
     
-    for (int i = 0; i < capacity; i++)
-    {
-        stk->data[i] = POISON;
-    }
-
-    stk->DATA_HASH = GenHash(stk->data, capacity*sizeof(elem_t));
-    
+    FillPoison(stk);
     SetBirds(stk);
+    ReHash(stk);
     
     *stk_id_ptr = (stack_id)stk;
-    return StackOk(stk);
+    
+    int err = StackOk(stk);
+    REPORT(stk, err);
+    return err;
 }
 
 int StackPush(stack_id stk_id, elem_t item)
 {
     stack *stk = (stack *)stk_id;
-    int err    = 0;
-
-    if (err = StackOk(stk))
-    {
-        printf("StackOK = %d\n", err);
-        PrintStack(stk_id);
-        return err;
-    }
+    int err = StackOk(stk);
+    REPORT(stk, err);
     
-    if (err = StackResize_UP(stk))
-    {
-        return err;
-    }
+    StackResize_UP(stk);
 
     stk->data[stk->size] = item;
     stk->size++;
 
-    stk->STACK_HASH = GenHash((CANARY_t *)stk + 1, sizeof(stack) - 2*sizeof(CANARY_t) - 2*sizeof(Hash));
-    stk->DATA_HASH  = GenHash(stk->data, stk->capacity*sizeof(elem_t));
+    ReHash(stk);
 
-    return StackOk(stk);
+    err = StackOk(stk);
+    REPORT(stk, err);
+    return err;
 }
 
 int StackPop(stack_id stk_id, elem_t *target)
 {
     stack *stk = (stack *)stk_id;
-    int err    = 0;
-    
-    if (err = StackOk(stk))
+    int err = StackOk(stk);
+    if (stk->size == 0)
     {
-        printf("StackOK = %d\n", err);
-        PrintStack(stk_id);
-        return err;
+        err |= NEGATIVE_SIZE;
     }
-    
+    REPORT(stk, err);
+
     stk->size--;
     *target              = stk->data[stk->size];
     stk->data[stk->size] = stk->POISON;
 
-    if (err = StackResize_DOWN(stk))
-    {
-        return err;
-    }
+    StackResize_DOWN(stk);
 
-    stk->STACK_HASH = GenHash((CANARY_t *)stk + 1, sizeof(stack) - 2*sizeof(CANARY_t) - 2*sizeof(Hash));
-    stk->DATA_HASH = GenHash(stk->data, stk->capacity*sizeof(elem_t));
+    ReHash(stk);
     
-    return StackOk(stk);
+    err = StackOk(stk);
+    REPORT(stk, err);
+    return err;
 }
 
-int StackDtor(stack_id *stk_id)
+int StackDtor(stack_id *stk_id_ptr)
 {
-    stack *stk      = (stack *)stk_id;
+    bool bad = IsBadReadPtr(stk_id_ptr, sizeof(stack_id));
+    assert(stk_id_ptr && !bad);
+
+    stack *stk = (stack *)*stk_id_ptr;
+    int err = StackOk(stk);
+
+    REPORT(stk, err);
 
     free((CANARY_t *)stk->data - 1);
-    stk->data       = (elem_t *)JUST_FREE_PTR;
+    stk->data = (elem_t *)JUST_FREE_PTR;
 
     stk->size       = -1;
     stk->capacity   = -1;
@@ -136,46 +146,42 @@ int StackDtor(stack_id *stk_id)
     stk->STACK_HASH = -1;
 
     free(stk);
-    *stk_id         = (stack_id)JUST_FREE_PTR;
+    *stk_id_ptr = (stack_id)JUST_FREE_PTR;
 
     return 0;
 }
 
-static int StackResize_UP(stack_id stk_id)
+static void StackResize_UP(stack_id stk_id)
 {
-    stack *stk    = (stack *)stk_id;
+    stack *stk = (stack *)stk_id;
 
-    while (stk->size >= stk->capacity)
+    if (stk->size >= stk->capacity)
     {
         size_t new_data_size = (stk->capacity*sizeof(elem_t)*factor) + 2*sizeof(CANARY_t);
-        stk->data = (elem_t *)((CANARY_t *)(realloc((CANARY_t *)stk->data - 1, new_data_size)) + 1);
+        stk->data = GetNewDataPtr(stk, new_data_size);
         assert(stk->data);
 
         stk->capacity *= factor;
-        for (int i = stk->size; i < stk->capacity; ++i)
-        {
-            stk->data[i] = stk->POISON;
-        }
+        FillPoison(stk);
         SetBirds(stk);
     }
-    return 0;
 }
 
-static int StackResize_DOWN(stack_id stk_id)
+static void StackResize_DOWN(stack_id stk_id)
 {
-    stack *stk   = (stack *)stk_id;
+    stack *stk = (stack *)stk_id;
     
     if (factor*factor*(stk->size) <= stk->capacity && stk->size != 0 &&
                              stk->capacity >= factor*factor*stk->start_capacity)
     {
         size_t new_data_size = (stk->capacity*sizeof(elem_t)/factor) + 2*sizeof(CANARY_t);
-        stk->data = (elem_t *)((CANARY_t *)(realloc((CANARY_t *)stk->data - 1, new_data_size)) + 1);
-        assert(stk->data);
-        
+
+        stk->data = GetNewDataPtr(stk, new_data_size);       
+        assert(stk->data); 
+
         stk->capacity /= factor;
         SetBirds(stk);
     }
-    return 0;
 }
 
 int StackOk(stack_id stk_id)
@@ -225,20 +231,32 @@ int StackOk(stack_id stk_id)
     return err;
 }
 
-void PrintStack(stack_id stk_id)
+void StackDump(stack_id stk_id)
 {
     stack *stk = (stack *)stk_id;
     int err = StackOk(stk);
-    if (err == 1)
+    if (err & NON_EXISTENT_STACK)
     {
-        printf("Stack Error: Wrong stack pointer\n\n");
+        printf("Stack Error: Wrong stack pointer: 0x%p\n\n", stk);
         return;
     }
+
     printf("\nStack info:\n");
-    printf("Left Stack Canary: %llu\nRight Stack Canary: %llu\n", stk->LeftCanary, stk->RightCanary);
+    printf("Left Stack Canary: %llu\n", stk->RightCanary);
+    printf("Right Stack Canary: %llu\n", stk->LeftCanary);
     printf("Stack Hash: %llu\n", stk->STACK_HASH);
     printf("Data Pointer: 0x%p\n", stk->data);
-    printf("Size: %lu\nCapacity: %lu\nData:\n", stk->size, stk->capacity);
+    printf("Size: %lu\n", stk->size);
+    printf("Capacity: %lu\n", stk->capacity);
+
+    if (err & WRONG_DATA_PTR)
+    {
+        printf("Wrong stack data pointer: 0x%p\n\n", stk->data);
+        return;
+    }
+    printf("Data Hash: %llu\n", stk->DATA_HASH);
+    printf("Data:\n");
+
     for (int i = 0; i < stk->capacity; ++i)
     {
         if (stk->data[i] == stk->POISON)
@@ -247,7 +265,7 @@ void PrintStack(stack_id stk_id)
         } 
         else
         {
-            printf("stk[%d] = %d\n", i, stk->data[i]);
+            printf("stack[%d] = %d\n", i, stk->data[i]);
         }
     }
     printf("\n\n");
@@ -255,7 +273,11 @@ void PrintStack(stack_id stk_id)
 
 static unsigned long long GenHash(void *memptr, size_t size_of_memblock)
 {
-    if (memptr == nullptr || IsBadReadPtr(memptr, size_of_memblock)){return 0;}
+    if (memptr == nullptr || IsBadReadPtr(memptr, size_of_memblock))
+    {
+        return 0;
+    }
+
     unsigned long long hash = 5381;
     char *ptr = (char *)memptr;
     int i = 0;
@@ -267,22 +289,66 @@ static unsigned long long GenHash(void *memptr, size_t size_of_memblock)
     return hash;
 }
 
-static int bin(int number)
+static elem_t *GetNewDataPtr(stack *stk, size_t new_size)
 {
-    int result = 0;
-
-    int sign = 1;
-    if (number < 0)
+    CANARY_t *buff_pointer = (CANARY_t *)(realloc((CANARY_t *)stk->data - 1, new_size));
+    if (buff_pointer == nullptr)
     {
-        number *= -1;
-        sign = -1;
+        return nullptr;
     }
+    return (elem_t *)(buff_pointer + 1);
+}
 
-    for (int m = 1; number > 0; m *= 10)
+static void FillPoison(stack *stk)
+{
+    for (int i = stk->size; i < stk->capacity; ++i)
     {
-        result += m * (number % 2);
-        number /= 2;
+        stk->data[i] = stk->POISON;
     }
+}
 
-    return sign * result;
+static void ReHash(stack *stk)
+{
+    stk->STACK_HASH = GenHash((CANARY_t *)stk + 1, sizeof(stack) - 2*sizeof(CANARY_t) - 2*sizeof(Hash));
+    stk->DATA_HASH = GenHash(stk->data, stk->capacity*sizeof(elem_t));
+}
+
+void getErrMsg(int err, const char **msg)
+{
+    switch (err)
+    {
+    case OK:
+        *msg = "Not Error";
+        break;
+    case NON_EXISTENT_STACK:
+        *msg = "NON-EXISTENT STACK";
+        break;
+    case STACK_CANARY_SIGNAL:
+        *msg = "STACK CANARY SIGNAL";
+        break;
+    case NEGATIVE_SIZE:
+        *msg = "NEGATIVE SIZE";
+        break;
+    case CAPACITY_LESS_THAN_SIZE:
+        *msg = "CAPACITY LESS THEN SIZE";
+        break;
+    case WRONG_DATA_PTR:
+        *msg = "WRONG DATA POINTER";
+        break;
+    case WRONG_STACK_HASH:
+        *msg = "WRONG STACK HASH";
+        break;
+    case DATA_CANARY_SIGNAL:
+        *msg = "DATA CANARY SIGNAL";
+        break;
+    case WRONG_CAPACITY:
+        *msg = "WRONG CAPACITY";
+        break;
+    case WRONG_DATA_HASH:
+        *msg = "WRONG DATA HASH";
+        break;    
+    default:
+        *msg = "UNDEFINED ERROR";
+        break;
+    }
 }

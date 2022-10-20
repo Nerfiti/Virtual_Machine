@@ -1,7 +1,7 @@
 #ifndef COMP_GENERALS_H
 #define COMP_GENERALS_H
 
-static const int maximum_cmd_length = 10;
+static const int maximum_cmd_length = 100;
 static const int signature_length   = 12;
 static const int cmd_id_mask        = (1 << 24) - 1; 
 static const int number_of_regs     = 4;

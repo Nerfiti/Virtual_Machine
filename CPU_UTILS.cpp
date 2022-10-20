@@ -20,6 +20,7 @@ void init_CPU(SoftCPU *CPU)
     assert(!fclose(code_bin));
 
     StackCtor(&(CPU->main_stk));
+    StackCtor(&(CPU->ret_stk ));
     CPU->head     = data;
     CPU->code     = (int *)(data + 1);
     CPU->IP       = 0;
@@ -32,14 +33,17 @@ void init_CPU(SoftCPU *CPU)
 void execute_CPU(SoftCPU *CPU)
 {
 
-    #define STACK     CPU->main_stk
-    #define POP(val)  StackPop(STACK, val)
-    #define PUSH(val) StackPush(STACK, val)
-    #define IP        CPU->IP
-    #define CMD       CPU->code[IP]
-    #define ARG(n)    CPU->code[IP + n]
-    #define REG(n)    CPU->reg[n]
-    #define RAM(n)    CPU->ram[n]
+    #define STACK        CPU->main_stk
+    #define POP(val)     StackPop(STACK, val)
+    #define PUSH(val)    StackPush(STACK, val)
+    #define IP           CPU->IP
+    #define CMD          CPU->code[IP]
+    #define ARG(n)       CPU->code[IP + n]
+    #define REG(n)       CPU->reg[n]
+    #define RAM(n)       CPU->ram[n]
+    #define RETSTACK     CPU->ret_stk
+    #define RETPUSH(val) StackPush(RETSTACK, val)
+    #define RETPOP(val)  StackPop(RETSTACK, val)   
 
     #define DEF_CMD(cmd, num, code) \
         case num:                   \
@@ -79,4 +83,10 @@ void CheckHead(Header head)
         printf("Wrong program version!");
         abort();
     }
+}
+
+void SegFault()
+{
+    printf("\nSEGMENTATION FAULT\n");
+    abort();
 }

@@ -53,18 +53,17 @@ void execute_ASM(Text input_data, bool first_assemble)
         char *string = input_data.lines[line].start;
         sscanf(string, "%s%n %s", command, &position, arg);
 
-
-        #define DEF_CMD(cmd, num, ...)                                                             \
-            if (stricmp(command, cmds[num]) == 0)                                             \
-            {                                                                                 \
-                int argc = 0;                                                                 \
-                int mode = ProcessingArgsAndGetMode(string + position, code + IP + 1, &argc); \
-                code[IP] = CMD_##cmd | mode;                                                  \
-                                                                                              \
-                PrintListing(listing_file, string, code + IP, argc + 1);                      \
-                                                                                              \
-                IP += argc + 1;                                                               \
-            }                                                                                 \
+        #define DEF_CMD(cmd, num, ...)                                                                        \
+            if (stricmp(command, cmds[num]) == 0)                                                             \
+            {                                                                                                 \
+                int argc = 0;                                                                                 \
+                int mode = ProcessingArgsAndGetMode(string + position, code + IP + 1, &argc, first_assemble); \
+                code[IP] = CMD_##cmd | mode;                                                                  \
+                                                                                                              \
+                PrintListing(listing_file, string, code + IP, argc + 1);                                      \
+                                                                                                              \
+                IP += argc + 1;                                                                               \
+            }                                                                                                 \
             else                                                                               
 
         #include "cmds.h"
@@ -73,6 +72,11 @@ void execute_ASM(Text input_data, bool first_assemble)
             if (strchr(command, ':'))
             {
                 SetLabel(command, IP);
+            }
+            else 
+            {
+                printf("Syntax Error: non-existent command: %s", command);
+                abort();
             }
         }
 
@@ -91,7 +95,7 @@ int SearchName(char *name)
 {
     for (int i = 0; i < label_arr_size; ++i)
     {
-        if (stricmp(name, ASM.label_arr[i].name) == 0)
+        if (stricmp(name, ASM.label_arr[i].name) == 0 && strlen(name) != 0)
         {
             return i;
         }
@@ -99,8 +103,31 @@ int SearchName(char *name)
     return -1;
 }
 
-int ProcessingArgsAndGetMode(char *args_line, int *args, int *argc)
+int ProcessingArgsAndGetMode(char *args_line, int *args, int *argc, bool first_assemble)
 {
+    int address_num = 0;
+    char name[maximum_cmd_length] = "";
+
+    if (strchr(args_line, ':'))
+    {
+        sscanf(args_line, "%s", name);
+        address_num = SearchName(name);
+        if (address_num != -1)
+        {
+            *argc = 1;
+            *args = ASM.label_arr[address_num].value;
+            return Without_special_args;
+        }
+        if (!first_assemble)
+        {
+            printf("Syntax Error: undefined reference to the \"%s\"", name);
+            abort();
+        }
+        *args = -1;
+        *argc =  1;
+        return Without_special_args;
+    }
+
     int   regnum    = -1;
     int   ramnum    = -1;
     char *reg_start = nullptr;

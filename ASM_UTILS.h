@@ -38,12 +38,12 @@ enum Regs
 void init_ASM(Text *input_data);
 void execute_ASM(Text input_data, bool first_assemble);
 int  SearchName(char *name);
-int  ProcessingArgsAndGetMode(char *args_line, int *args, int *argc);
+int  ProcessingArgsAndGetMode(char *args_line, int *args, int *argc, bool first_assemble);
 void PrintListing(FILE *listingfile, char *asm_line, int *code, int argc);
 void PrintHeader(FILE* listing_file, Header head);
 void DelComment(char *line, char comm_symbol);
 void SetLabel(char *command, int IP);
 void PrintCode(FILE *out_bin, Header head, int *code, int code_len);
-int GetRegNum(char *reg_name);
+int  GetRegNum(char *reg_name);
 
 #endif //ASM_UTILS_H
