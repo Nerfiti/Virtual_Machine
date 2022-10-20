@@ -1,20 +1,20 @@
-push 1 
-call rec:
+push 1
+dump
+push 2
+dump
+push 3
+dump
+push 4
+dump
+push 5
+dump
+add
+dump
+add
+dump
+add
+dump
+add
+dump
+out
 hlt
-
-rec: 
-
-dup 
-dup 
-mul 
-out 
-push 1 
-add 
- 
-dup 
-push 10000
-ja end:
-call rec: 
- 
-end: 
-ret

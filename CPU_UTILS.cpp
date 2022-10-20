@@ -37,8 +37,9 @@ void execute_CPU(SoftCPU *CPU)
     #define POP(val)     StackPop(STACK, val)
     #define PUSH(val)    StackPush(STACK, val)
     #define IP           CPU->IP
-    #define CMD          CPU->code[IP]
-    #define ARG(n)       CPU->code[IP + n]
+    #define CODE         CPU->code
+    #define CMD          CODE[IP]
+    #define ARG(n)       CODE[IP + n]
     #define REG(n)       CPU->reg[n]
     #define RAM(n)       CPU->ram[n]
     #define RETSTACK     CPU->ret_stk

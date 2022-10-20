@@ -162,10 +162,41 @@ DEF_CMD(POP, 15,
             IP += 2;
         )
 
+#define COMMA ,
 DEF_CMD(DUMP, 16,
             StackDump(STACK);
             IP++;
+            int start = (0 > IP - 4) ? 0 : IP - 4;
+            int finish = 0;
+            for (int i = 0; i <= 4; ++i)
+            {
+                finish = IP + i;
+                if (CODE[IP + i] == CMD_HLT) break;
+            }
+            printf("IP   --| ");
+            for (int i = start; i < finish; ++i)
+            {
+                printf(" %2d " COMMA i);
+            }
+            printf(" |--\n" "CODE --| ");
+            for (int i = start; i < finish; ++i)
+            {
+                printf(" %2d " COMMA CODE[i]);
+            }
+            printf(" |--\n      ");
+            for (int i = start; i < IP; ++i)
+            {
+                printf("    ");
+            }
+            printf("^\n      ");
+            for (int i = start; i < IP; ++i)
+            {
+                printf("    ");
+            }
+            printf("| Instruction Pointer (IP)\n");
+            system("pause");
         )
+#undef COMMA
 
 DEF_CMD(CALL, 17,
             if (ARG(1) < 0 || ARG(1) > size_of_ram) SegFault();
