@@ -1,0 +1,30 @@
+	push 0
+	pop RAX
+
+start:
+
+	push RAX
+
+	pop [300 + RAX]
+
+	call INCREASE_RAX:
+
+	push RAX
+	push 4500
+	jae paint:
+	jmp start:
+
+paint:
+
+	pnt
+	push 1
+	pop RAX
+	jmp paint:
+	hlt
+
+	INCREASE_RAX:
+    		push 1
+        	push RAX
+     	add
+     	pop RAX
+	ret

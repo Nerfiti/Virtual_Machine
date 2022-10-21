@@ -1,0 +1,20 @@
+PDA 6
+	push 0              |1 0 
+	pop RAX             |15 1 
+	push RAX            |1 1 
+	pop [300 + RAX]     |15 300 1 
+	call INCREASE_RAX:  |17 27 
+	push RAX            |1 1 
+	push 4500           |1 4500 
+	jae paint:          |12 19 
+	jmp start:          |8 4 
+	pnt                 |19 
+	push 1              |1 1 
+	pop RAX             |15 1 
+	jmp paint:          |8 19 
+	hlt                 |23 
+    		push 1         |1 1 
+        	push RAX    |1 1 
+     	add            |2 
+     	pop RAX        |15 1 
+	ret                 |18 
