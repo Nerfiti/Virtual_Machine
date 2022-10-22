@@ -19,6 +19,7 @@ struct label
 
 struct ASM_t
 {
+    Text input_data = {};
     
     int index = 0;
     label label_arr[label_arr_size] = {};
@@ -35,8 +36,8 @@ enum Regs
 
 
 int  ProcArgsGetMode (char *args_line, int *args, int *argc, bool first_assemble);
-void init_ASM        (Text *input_data);
-void execute_ASM     (Text input_data, bool first_assemble);
+void init_ASM        (ASM_t *ASM);
+void execute_ASM     (ASM_t *ASM, bool first_assemble);
 int  SearchName      (char *name);
 void PrintListing    (FILE *listingfile, char *asm_line, int *code, int argc);
 void PrintHeader     (FILE* listing_file, Header head);

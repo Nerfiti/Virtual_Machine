@@ -2,48 +2,52 @@
 
 const Header head = {};
 
-const char *input_filename    = "C:/Users/penko/Projects/Compiler/ASM/input.txt";
-const char *listing_filename  = "C:/Users/penko/Projects/Compiler/ASM/Listing.txt";
-const char *out_bin_filename  = "C:/Users/penko/Projects/Compiler/Generals/code_machine.bin";
-
 ASM_t ASM = {};
 
-void init_ASM(Text *input_data)
+void init_ASM(ASM_t *ASM)
 {
+    const char *input_filename    = "C:/Users/penko/Projects/Compiler/ASM/input.txt";
+
     FILE *input_file  = fopen(input_filename, "r");
     assert(input_file);
     
-    file_to_memory(input_file, input_data);
-    text_to_lines (input_data);
+    file_to_memory(input_file, &ASM->input_data);
+    text_to_lines (&ASM->input_data);
+
+    assert(fclose(input_file));
 }
 
 
-void execute_ASM(Text input_data, bool first_assemble)
+void execute_ASM(ASM_t *ASM, bool first_assemble)
 {
+    const char *listing_filename  = "C:/Users/penko/Projects/Compiler/ASM/Listing.txt";
+    const char *out_bin_filename  = "C:/Users/penko/Projects/Compiler/Generals/code_machine.bin";
+
     FILE *listing_file = fopen(listing_filename, "w");
     FILE *out_bin      = fopen(out_bin_filename, "wb");
     
     assert(listing_file);
     assert(out_bin     );
 
-    int *code    = (int *)calloc(2 * input_data.nLines, sizeof(int));
+    int *code    = (int *)calloc(2 * ASM->input_data.nLines, sizeof(int));
     assert(code);
 
     int line     = 0;
     int position = 0;
     int IP       = 0;
-    ASM.index    = 0;
+    ASM->index    = 0;
+    Text *input_data = &ASM->input_data;
 
     char command[maximum_cmd_length + 1] = "";  
     
     PrintHeader(listing_file, head);
 
-    while(line < input_data.nLines)
+    while(line < input_data->nLines)
     {
-        DelComment(input_data.lines[line].start, ';');
+        DelComment(input_data->lines[line].start, ';');
 
         char arg[maximum_cmd_length] = "";
-        char *string = input_data.lines[line].start;
+        char *string = input_data->lines[line].start;
         sscanf(string, "%s%n %s", command, &position, arg);
 
         #define DEF_CMD(cmd, num, ...)                                                                        \

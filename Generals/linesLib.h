@@ -9,7 +9,7 @@ struct Line{
 };
 
 struct Text{
-    int nLines = 0;
+    int   nLines = 0;
     char *content = nullptr;
     Line* lines = nullptr;
 };

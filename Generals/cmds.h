@@ -1,3 +1,5 @@
+#define COMMA ,
+
 DEF_CMD(PUSH, 1,
             int arg = 0;
             if ((CMD & With_RAM) && (CMD & With_REG) && (CMD & With_PLUS))
@@ -161,7 +163,6 @@ DEF_CMD(POP, 15,
             IP += 2;
         )
 
-#define COMMA ,
 DEF_CMD(DUMP, 16,
             StackDump(STACK);
             IP++;
@@ -195,7 +196,6 @@ DEF_CMD(DUMP, 16,
             printf("| Instruction Pointer (IP)\n");
             system("pause");
         )
-#undef COMMA
 
 DEF_CMD(CALL, 17,
             if (ARG(1) < 0 || ARG(1) > size_of_ram) SegFault();
@@ -215,18 +215,18 @@ DEF_CMD(PNT, 19,
             {
                 for (int x = 0; x < window_width; ++x)
                 {
-                    int point = REG(0) + x + window_width * y;
+                    int point = REG(ARG(1)) + x + window_width * y;
                     
                     char ch = 0;
                     if (RAM(point) == 0) ch = ' ';
                     else ch = '*';
 
-                    screen[point - REG(0)] = ch;
+                    screen[point - REG(ARG(1))] = ch;
                 }
                 screen[(y+1)*window_width - 1] = '\n';
             }
             printf("%s", screen);
-            REG(0) = 300 + REG(0)%10 + 1;
+            REG(0) = 300 + REG(ARG(1))%10 + 1;
             IP++;
         )
 
@@ -241,22 +241,35 @@ DEF_CMD(SLP, 21,
         )
 
 DEF_CMD(MTX, 22,
-            system("color a");
+            
             char line [window_width + 1] = "";
             for (int x = 0; x < window_width; ++x)
             {
                 int point = REG(0) + x;
                 
                 char ch = 0;
-                if (RAM(point)%10 >= 0 && RAM(point)%10 < 6) ch = ' ';
-                else ch = rand()%10 + '0'; 
+                if (RAM(point) == 0) ch = ' ';
+                else
+                {
+                    ch = (rand()%10 > 5) ? rand()%10 + '0' : ' ';
+                } 
                 line [x] = ch;
             }
             printf("%s\n", line);
             IP++;
         )
 
-DEF_CMD(HLT, 23,
+DEF_CMD(COLOR, 23,
+            int cmd_len = 20;
+            char cmd[cmd_len] = "";
+            sprintf(cmd, "color %.1p" COMMA ARG(1));
+            system(cmd);
+            IP += 2;
+        )
+
+DEF_CMD(HLT, 24,
             assert(!fclose(CPU->result));
             return;
         )
+
+#undef COMMA

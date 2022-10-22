@@ -1,30 +1,28 @@
-	push 0
-	pop RAX
+color 2
+push 1
+pop RAX
 
-start:
+                start:
 
-	push RAX
+push 7
+pop [300 + RAX]
 
-	pop [300 + RAX]
+call INCREASE_RAX:
 
-	call INCREASE_RAX:
+push RAX
+push 150
+ja print:
+jmp start:
 
-	push RAX
-	push 4500
-	jae paint:
-	jmp start:
+                print:
+MTX
+slp 1000
+jmp print:
+hlt
 
-paint:
-
-	pnt
-	push 1
-	pop RAX
-	jmp paint:
-	hlt
-
-	INCREASE_RAX:
-    		push 1
-        	push RAX
-     	add
-     	pop RAX
-	ret
+INCREASE_RAX:
+    push 4
+    push RAX
+    add
+    pop RAX
+ret

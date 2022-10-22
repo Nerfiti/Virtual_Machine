@@ -2,12 +2,12 @@
 
 int main()
 {
-    Text input_data = {};
+    ASM_t ASM = {};
 
-    init_ASM(&input_data);
+    init_ASM(&ASM);
 
-    execute_ASM(input_data, true );
-    execute_ASM(input_data, false);
+    execute_ASM(&ASM, true );
+    execute_ASM(&ASM, false);
 
     return 0;
 }
