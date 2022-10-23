@@ -262,7 +262,7 @@ DEF_CMD(MTX, 22,
 DEF_CMD(COLOR, 23,
             int cmd_len = 20;
             char cmd[cmd_len] = "";
-            sprintf(cmd, "color %.1p" COMMA ARG(1));
+            sprintf(cmd, "color %.2p" COMMA ARG(1));
             system(cmd);
             IP += 2;
         )

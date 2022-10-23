@@ -1,5 +1,5 @@
 PDA 6
-color 18             |23 18 
+color 2              |23 2 
 push 1               |1 1 
 pop RAX              |15 1 
 push 7               |1 7 
@@ -10,7 +10,7 @@ push 150             |1 150
 ja print:            |11 21 
 jmp start:           |8 6 
 MTX                  |22 
-slp 1000             |21 1000 
+slp 45               |21 45 
 jmp print:           |8 21 
 hlt                  |24 
     push 4           |1 4 

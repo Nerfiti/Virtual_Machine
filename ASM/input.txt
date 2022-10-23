@@ -16,7 +16,7 @@ jmp start:
 
                 print:
 MTX
-slp 1000
+slp 45
 jmp print:
 hlt
 

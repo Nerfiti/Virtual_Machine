@@ -6,7 +6,7 @@ ASM_t ASM = {};
 
 void init_ASM(ASM_t *ASM)
 {
-    const char *input_filename    = "C:/Users/penko/Projects/Compiler/ASM/input.txt";
+    const char *input_filename = "C:/Users/penko/Projects/Compiler/ASM/input.txt";
 
     FILE *input_file  = fopen(input_filename, "r");
     assert(input_file);
@@ -14,7 +14,7 @@ void init_ASM(ASM_t *ASM)
     file_to_memory(input_file, &ASM->input_data);
     text_to_lines (&ASM->input_data);
 
-    assert(fclose(input_file));
+    assert(!fclose(input_file));
 }
 
 
