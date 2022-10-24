@@ -8,6 +8,7 @@
 
 #include "Comp_Generals.h"
 #include "linesLib.h"
+#include "SolveEquation.h"
 
 #include "stack.h"
 

@@ -3,7 +3,7 @@ CC = g++ -c
 LINKER = g++
 SRC = $(wildcard *.cpp)
 OBJ = $(wildcard *.o) 
-CXXFLAGS = -IC:\Users\penko\Projects\Compiler\Generals
+CXXFLAGS = -IC:\Users\penko\CLionProjects\Equations -IC:\Users\penko\Projects\Compiler\Generals 
 
 $(TARGET) : obj
 	$(LINKER) $(OBJ) -o $(TARGET) 

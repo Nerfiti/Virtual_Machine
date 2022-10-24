@@ -267,7 +267,29 @@ DEF_CMD(COLOR, 23,
             IP += 2;
         )
 
-DEF_CMD(HLT, 24,
+DEF_CMD(SQR, 24,
+            const int max_ans_len = 100;
+            int a = 0;
+            int b = 0;
+            int c = 0;
+            double x1 = 0;
+            double x2 = 0;
+            NumberOfRoots nRoots = NO_ROOTS;
+            char ans[max_ans_len] = "";
+
+            POP(&c);
+            POP(&b);
+            POP(&a);
+
+            nRoots = solveSquare(a, b, c, &x1, &x2);
+
+            sPrintAnswer(ans, nRoots, x1, x2);
+            printf("%s", ans);
+            fprintf(CPU->result, "%s", ans);
+            IP++;
+            )
+
+DEF_CMD(HLT, 25,
             assert(!fclose(CPU->result));
             return;
         )
