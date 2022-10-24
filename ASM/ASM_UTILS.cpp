@@ -35,7 +35,7 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
     int line     = 0;
     int position = 0;
     int IP       = 0;
-    ASM->index    = 0;
+    ASM->index   = 0;
     Text *input_data = &ASM->input_data;
 
     char command[maximum_cmd_length + 1] = "";  
@@ -50,17 +50,21 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
         char *string = input_data->lines[line].start;
         sscanf(string, "%s%n %s", command, &position, arg);
 
-        #define DEF_CMD(cmd, num, ...)                                                                        \
-            if (stricmp(command, cmds[num]) == 0)                                                             \
-            {                                                                                                 \
-                int argc = 0;                                                                                 \
-                int mode = ProcArgsGetMode(string + position, code + IP + 1, &argc, first_assemble); \
-                code[IP] = CMD_##cmd | mode;                                                                  \
-                                                                                                              \
-                PrintListing(listing_file, string, code + IP, argc + 1);                                      \
-                                                                                                              \
-                IP += argc + 1;                                                                               \
-            }                                                                                                 \
+        #define DEF_CMD(cmd, num, ...)                                                      \
+            if (stricmp(command, cmds[num]) == 0)                                           \
+            {                                                                               \
+                int argc = 0;                                                               \
+                int mode = 0;                                                               \
+                if (!first_assemble)                                                        \
+                {                                                                           \
+                    mode = ProcArgsGetMode(string + position, code + IP + 1, &argc);        \
+                }                                                                           \
+                code[IP] = CMD_##cmd | mode;                                                \
+                                                                                            \
+                PrintListing(listing_file, string, code + IP, argc + 1);                    \
+                                                                                            \
+                IP += argc + 1;                                                             \
+            }                                                                               \
             else                                                                               
 
         #include "cmds.h"
@@ -73,6 +77,13 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
             else if (stricmp(command, ";") == 0)
             {
                 ;
+            }
+            else if (strchr(input_data->lines[line].start, '='))
+            {
+                int value =  0;
+
+                sscanf(input_data->lines[line].start, "%*[^=]= %d", &value);
+                SetLabel(command, value);
             }
             else 
             {
@@ -104,28 +115,17 @@ int SearchName(char *name)
     return -1;
 }
 
-int ProcArgsGetMode(char *args_line, int *args, int *argc, bool first_assemble)
+int ProcArgsGetMode(char *args_line, int *args, int *argc)
 {
     int address_num = 0;
     char name[maximum_cmd_length] = "";
 
-    if (strchr(args_line, ':'))
+    sscanf(args_line, "%s", name);
+    address_num = SearchName(name);
+    if (address_num != -1)
     {
-        sscanf(args_line, "%s", name);
-        address_num = SearchName(name);
-        if (address_num != -1)
-        {
-            *argc = 1;
-            *args = ASM.label_arr[address_num].value;
-            return Without_special_args;
-        }
-        if (!first_assemble)
-        {
-            printf("Syntax Error: undefined reference to the \"%s\"", name);
-            abort();
-        }
-        *args = -1;
-        *argc =  1;
+        *argc = 1;
+        *args = ASM.label_arr[address_num].value;
         return Without_special_args;
     }
 
@@ -202,6 +202,7 @@ int ProcArgsGetMode(char *args_line, int *args, int *argc, bool first_assemble)
 
         return With_REG;
     }
+
     *argc = sscanf(args_line, "%d", args);
     if (*argc == EOF)
     {
@@ -234,17 +235,17 @@ void DelComment(char *line, char comm_symbol)
     }
 }
 
-void SetLabel(char *command, int IP)
+void SetLabel(char *command, int value)
 {
     int name_num = 0;
     if ((name_num = SearchName(command)) != -1)
     {
-        ASM.label_arr[name_num].value = IP;
+        ASM.label_arr[name_num].value = value;
     }
     else
     {
         sscanf(command, "%s:", ASM.label_arr[ASM.index].name);
-        ASM.label_arr[ASM.index].value = IP;
+        ASM.label_arr[ASM.index].value = value;
         ASM.index++;
     }
 }

@@ -1,6 +1,43 @@
+dump
+color 2
+dump
 push 1
-push 2
-push 1
+dump
+pop RAX
+dump
 
-sqr
+
+                start:
+dump
+push 7
+dump
+pop [300 + RAX]
+dump
+
+call INCREASE_RAX:
+dump
+
+push RAX
+dump
+push 130
+dump
+ja print:
+jmp start:
+
+                print:
+MTX
+slp 45
+jmp print:
 hlt
+
+INCREASE_RAX:
+dump
+    push 4
+dump
+    push RAX
+dump
+    add
+dump
+    pop RAX
+dump
+ret

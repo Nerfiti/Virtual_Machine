@@ -1,6 +1,35 @@
 PDA 6
+dump                 |16 
+color 2              |23 2 
+dump                 |16 
 push 1               |1 1 
-push 2               |1 2 
-push 1               |1 1 
-sqr                  |24 
+dump                 |16 
+pop RAX              |15 1 
+dump                 |16 
+dump                 |16 
+push 7               |1 7 
+dump                 |16 
+pop [300 + RAX]      |15 300 1 
+dump                 |16 
+call INCREASE_RAX:   |17 24 
+dump                 |16 
+push RAX             |1 1 
+dump                 |16 
+push 130             |1 130 
+dump                 |16 
+ja print:            |11 20 
+jmp start:           |8 10 
+MTX                  |22 
+slp 45               |21 45 
+jmp print:           |8 31 
 hlt                  |25 
+dump                 |16 
+    push 4           |1 4 
+dump                 |16 
+    push RAX         |1 1 
+dump                 |16 
+    add              |2 
+dump                 |16 
+    pop RAX          |15 1 
+dump                 |16 
+ret                  |18 

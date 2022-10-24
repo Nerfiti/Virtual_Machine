@@ -176,22 +176,22 @@ DEF_CMD(DUMP, 16,
             printf("IP   --| ");
             for (int i = start; i < finish; ++i)
             {
-                printf(" %2d " COMMA i);
+                printf(" %3d " COMMA i);
             }
             printf(" |--\n" "CODE --| ");
             for (int i = start; i < finish; ++i)
             {
-                printf(" %2d " COMMA CODE[i]);
+                printf(" %3d " COMMA CODE[i] & cmd_id_mask);
             }
             printf(" |--\n      ");
             for (int i = start; i < IP; ++i)
             {
-                printf("    ");
+                printf("     ");
             }
             printf("^\n      ");
             for (int i = start; i < IP; ++i)
             {
-                printf("    ");
+                printf("     ");
             }
             printf("| Instruction Pointer (IP)\n");
             system("pause");
