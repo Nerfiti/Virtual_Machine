@@ -1,0 +1,13 @@
+TARGET = ../ASM.exe
+CC = g++ -c
+LINKER = g++
+CXXFLAGS = -I..\Generals
+
+$(TARGET) : ASM.o ASM_UTILS.o
+	$(LINKER) ASM.o ASM_UTILS.o Eqlogger.o linesLib.o MyGeneralFunctions.o SolveEquation.o stack.o -o $(TARGET)
+
+ASM.o : ../ASM/ASM.cpp
+	$(CC) $(CXXFLAGS) ../ASM/ASM.cpp -o ASM.o
+
+ASM_UTILS.o : ../ASM/ASM_UTILS.cpp
+	$(CC) $(CXXFLAGS) ../ASM/ASM_UTILS.cpp -o ASM_UTILS.o

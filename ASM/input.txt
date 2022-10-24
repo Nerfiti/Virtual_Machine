@@ -1,43 +1,101 @@
-dump
-color 2
-dump
 push 1
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+dup
+add
+sub
+mul
+div
+dup
 dump
+out
+jmp next:
+jb next:
+jbe next:
+ja next:
+jae next:
+je next:
+jne next:
+pop 1
 pop RAX
+pop [RBX]
+pop [RCX + 10]
+pop [10 + RDX]
 dump
-
-
-                start:
-dump
-push 7
-dump
-pop [300 + RAX]
-dump
-
-call INCREASE_RAX:
-dump
-
-push RAX
-dump
-push 130
-dump
-ja print:
-jmp start:
-
-                print:
-MTX
-slp 45
-jmp print:
-hlt
-
-INCREASE_RAX:
-dump
-    push 4
-dump
-    push RAX
-dump
-    add
-dump
-    pop RAX
-dump
-ret
+call next:
+next:
+pnt
+rnd
+slp 22
+mtx 
+color 24
+sqr
+hlt 

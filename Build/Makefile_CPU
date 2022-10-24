@@ -1,0 +1,13 @@
+TARGET = ../CPU.exe
+CC = g++ -c
+LINKER = g++
+CXXFLAGS = -I..\Generals -IC:\Users\penko\CLionProjects\Equations
+
+$(TARGET) : SoftCPU.o CPU_UTILS.o
+	$(LINKER) SoftCPU.o CPU_UTILS.o Eqlogger.o linesLib.o MyGeneralFunctions.o SolveEquation.o stack.o -o $(TARGET)
+
+SoftCPU.o : ../CPU/SoftCPU.cpp
+	$(CC) $(CXXFLAGS) ../CPU/SoftCPU.cpp -o SoftCPU.o
+
+CPU_UTILS.o : ../CPU/CPU_UTILS.cpp
+	$(CC) $(CXXFLAGS) ../CPU/CPU_UTILS.cpp -o CPU_UTILS.o

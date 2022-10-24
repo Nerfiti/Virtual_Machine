@@ -1,0 +1,13 @@
+TARGET = ../DisASM.exe
+CC = g++ -c
+LINKER = g++
+CXXFLAGS = -I..\Generals
+
+$(TARGET) : DisASM.o DisASM_UTILS.o
+	$(LINKER) DisASM.o DisASM_UTILS.o Eqlogger.o linesLib.o MyGeneralFunctions.o SolveEquation.o stack.o -o $(TARGET)
+
+DisASM.o : ../DisASM/DisASM.cpp
+	$(CC) $(CXXFLAGS) ../DisASM/DisASM.cpp -o DisASM.o
+
+DisASM_UTILS.o : ../DisASM/DisASM_UTILS.cpp
+	$(CC) $(CXXFLAGS) ../DisASM/DisASM_UTILS.cpp -o DisASM_UTILS.o

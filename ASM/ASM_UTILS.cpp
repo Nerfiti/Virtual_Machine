@@ -1,12 +1,8 @@
 #include "ASM_UTILS.h"
 
-const Header head = {};
-
-ASM_t ASM = {};
-
 void init_ASM(ASM_t *ASM)
 {
-    const char *input_filename = "C:/Users/penko/Projects/Compiler/ASM/input.txt";
+    const char *input_filename = "./ASM/input.txt";
 
     FILE *input_file  = fopen(input_filename, "r");
     assert(input_file);
@@ -20,8 +16,10 @@ void init_ASM(ASM_t *ASM)
 
 void execute_ASM(ASM_t *ASM, bool first_assemble)
 {
-    const char *listing_filename  = "C:/Users/penko/Projects/Compiler/ASM/Listing.txt";
-    const char *out_bin_filename  = "C:/Users/penko/Projects/Compiler/Generals/code_machine.bin";
+    Header head = {};
+
+    const char *listing_filename  = "./ASM/Listing.txt";
+    const char *out_bin_filename  = "./Generals/code_machine.bin";
 
     FILE *listing_file = fopen(listing_filename, "w");
     FILE *out_bin      = fopen(out_bin_filename, "wb");
@@ -50,21 +48,17 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
         char *string = input_data->lines[line].start;
         sscanf(string, "%s%n %s", command, &position, arg);
 
-        #define DEF_CMD(cmd, num, ...)                                                      \
-            if (stricmp(command, cmds[num]) == 0)                                           \
-            {                                                                               \
-                int argc = 0;                                                               \
-                int mode = 0;                                                               \
-                if (!first_assemble)                                                        \
-                {                                                                           \
-                    mode = ProcArgsGetMode(string + position, code + IP + 1, &argc);        \
-                }                                                                           \
-                code[IP] = CMD_##cmd | mode;                                                \
-                                                                                            \
-                PrintListing(listing_file, string, code + IP, argc + 1);                    \
-                                                                                            \
-                IP += argc + 1;                                                             \
-            }                                                                               \
+        #define DEF_CMD(cmd, num, ...)                                                                      \
+            if (stricmp(command, cmds[num]) == 0)                                                           \
+            {                                                                                               \
+                int argc = 0;                                                                               \
+                int mode = ProcArgsGetMode(*ASM, string + position, code + IP + 1, &argc, first_assemble);  \
+                code[IP] = CMD_##cmd | mode;                                                                \
+                                                                                                            \
+                PrintListing(listing_file, string, code + IP, argc + 1);                                    \
+                                                                                                            \
+                IP += argc + 1;                                                                             \
+            }                                                                                               \
             else                                                                               
 
         #include "cmds.h"
@@ -72,7 +66,7 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
         {
             if (strchr(command, ':'))
             {
-                SetLabel(command, IP);
+                SetLabel(ASM, command, IP);
             }
             else if (stricmp(command, ";") == 0)
             {
@@ -83,7 +77,7 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
                 int value =  0;
 
                 sscanf(input_data->lines[line].start, "%*[^=]= %d", &value);
-                SetLabel(command, value);
+                SetLabel(ASM, command, value);
             }
             else 
             {
@@ -103,7 +97,7 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
     assert(!fclose(out_bin    ));
 }
 
-int SearchName(char *name)
+int SearchName(ASM_t ASM, char *name)
 {
     for (int i = 0; i < label_arr_size; ++i)
     {
@@ -115,13 +109,19 @@ int SearchName(char *name)
     return -1;
 }
 
-int ProcArgsGetMode(char *args_line, int *args, int *argc)
+int ProcArgsGetMode(ASM_t ASM, char *args_line, int *args, int *argc, bool first_assemble)
 {
+    if (strchr(args_line, ':') && first_assemble)
+    {
+        *argc = 1;
+        return 0;
+    }
+
     int address_num = 0;
     char name[maximum_cmd_length] = "";
 
     sscanf(args_line, "%s", name);
-    address_num = SearchName(name);
+    address_num = SearchName(ASM, name);
     if (address_num != -1)
     {
         *argc = 1;
@@ -147,7 +147,7 @@ int ProcArgsGetMode(char *args_line, int *args, int *argc)
             if (*farg != 'R')
             {
                 args[0] = atoi(farg);
-                if ((args[1] = GetRegNum(sarg)) == -1)
+                if ((args[1] = GetRegNum(sarg)) == -1 && !first_assemble)
                 {
                     printf("Syntax Error: Wrong Register Name. %s\n", sarg);
                     abort();
@@ -157,7 +157,7 @@ int ProcArgsGetMode(char *args_line, int *args, int *argc)
             if (*sarg != 'R')
             {
                 args[0] = atoi(sarg);
-                if ((args[1] = GetRegNum(farg)) == -1)
+                if ((args[1] = GetRegNum(farg)) == -1 && !first_assemble)
                 {
                     printf("Syntax Error: Wrong Register Name. %s\n", farg);
                     abort();
@@ -181,7 +181,7 @@ int ProcArgsGetMode(char *args_line, int *args, int *argc)
             }
             
             //else
-            if ((args[0] = GetRegNum(arg)) == -1)
+            if ((args[0] = GetRegNum(arg)) == -1 && !first_assemble)
             {
                 printf("Syntax Error: Wrong Register Name. %s\n", arg);
                 abort();
@@ -194,7 +194,7 @@ int ProcArgsGetMode(char *args_line, int *args, int *argc)
     {
         *argc = 1;
         
-        if ((args[0] = GetRegNum(reg_start)) == -1)
+        if ((args[0] = GetRegNum(reg_start)) == -1 && !first_assemble)
         {
             printf("Syntax Error: Wrong Register Name. %s\n", reg_start);
             abort();
@@ -235,18 +235,18 @@ void DelComment(char *line, char comm_symbol)
     }
 }
 
-void SetLabel(char *command, int value)
+void SetLabel(ASM_t *ASM, char *command, int value)
 {
     int name_num = 0;
-    if ((name_num = SearchName(command)) != -1)
+    if ((name_num = SearchName(*ASM, command)) != -1)
     {
-        ASM.label_arr[name_num].value = value;
+        ASM->label_arr[name_num].value = value;
     }
     else
     {
-        sscanf(command, "%s:", ASM.label_arr[ASM.index].name);
-        ASM.label_arr[ASM.index].value = value;
-        ASM.index++;
+        sscanf(command, "%s:", ASM->label_arr[ASM->index].name);
+        ASM->label_arr[ASM->index].value = value;
+        ASM->index++;
     }
 }
 

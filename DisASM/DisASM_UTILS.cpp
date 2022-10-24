@@ -1,12 +1,10 @@
 #include "DisASM_UTILS.h"
 
-const int   version_CPU     = 6;
-const char *input_filename  = "C:/Users/penko/Projects/Compiler/Generals/code_machine.bin";
-const char *output_filename = "C:/Users/penko/Projects/Compiler/DisASM/DisASM Result.txt";
-
 void init_ASM(DisASM *disasm)
 {
     assert(disasm);
+
+    const char *input_filename  = "./Generals/code_machine.bin";
 
     FILE *code_bin    = fopen(input_filename, "rb");
     assert(code_bin);
@@ -28,13 +26,16 @@ void init_ASM(DisASM *disasm)
 
 void execute_ASM(DisASM *disasm)
 {
+
+    const char *output_filename = "./DisASM/DisASM Result.txt";
+
     FILE *DisASM_result = fopen(output_filename, "w");
     
     fprintf(DisASM_result, "%s %d\n", disasm->head->signature, disasm->head->version);
 
-    #define IP        disasm->IP
-    #define CMD       disasm->code[IP]
-    #define ARG(n)    disasm->code[IP + n]
+    #define IP     disasm->IP
+    #define CMD    disasm->code[IP]
+    #define ARG(n) disasm->code[IP + n]
 
     while(true)
     {
@@ -156,8 +157,8 @@ void execute_ASM(DisASM *disasm)
             }
             case CMD_CALL:
             {
-                fprintf(DisASM_result, "CALL\n");
-                IP++;
+                fprintf(DisASM_result, "CALL %d\n", ARG(1));
+                IP += 2;
                 break;
             }
             case CMD_RET:
@@ -171,6 +172,36 @@ void execute_ASM(DisASM *disasm)
                 fprintf(DisASM_result, "PNT\n");
                 IP++;
                 break;      
+            }
+            case CMD_RND:
+            {
+                fprintf(DisASM_result, "RND\n");
+                IP++;
+                break; 
+            }
+            case CMD_SLP:
+            {
+                fprintf(DisASM_result, "SLP %d\n", ARG(1));
+                IP += 2;
+                break; 
+            }
+            case CMD_MTX:
+            {
+                fprintf(DisASM_result, "MTX\n");
+                IP++;
+                break; 
+            }
+            case CMD_COLOR:
+            {
+                fprintf(DisASM_result, "COLOR %d\n", ARG(1));
+                IP += 2;
+                break; 
+            }
+            case CMD_SQR:
+            {
+                fprintf(DisASM_result, "SQR\n");
+                IP++;
+                break;
             }
             case CMD_HLT:
             {
@@ -192,6 +223,8 @@ void execute_ASM(DisASM *disasm)
 
 void CheckHead(Header head)
 {
+    const int version_CPU = 6;
+
     if (strcmp(head.signature, "PDA"))
     {
         printf("Wrong signature!");

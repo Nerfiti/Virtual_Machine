@@ -1,15 +1,9 @@
 TARGET = ASM.exe
 CC = g++ -c
-LINKER = g++
 SRC = $(wildcard *.cpp)
-OBJ = $(wildcard *.o) 
+OBJ = $(patsubst %.cpp, %.o, $(SRC))
 CXXFLAGS = -IC:\Users\penko\Projects\Compiler\Generals
 
-$(TARGET) : obj
-	$(LINKER) $(OBJ) -o $(TARGET) 
-
-obj :
-	$(CC) $(CXXFLAGS) $(SRC)
-
-clean :
-	del $(patsubst %.cpp, %.o, $(SRC))
+../Build/ASM.o ../Build/ASM_UTILS.o : ASM.cpp ASM_UTILS.cpp
+	$(CC) $(CXXFLAGS) ASM.cpp -o ../Build/ASM.o
+	$(CC) $(CXXFLAGS) ASM_UTILS.cpp -o ../Build/ASM_UTILS.o

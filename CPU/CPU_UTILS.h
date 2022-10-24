@@ -12,10 +12,6 @@
 
 #include "stack.h"
 
-extern const int   version_CPU;
-extern const char *input_filename;
-extern const char *output_filename;
-
 const int number_of_registers = 5;
 const int size_of_ram         = 262144;
 

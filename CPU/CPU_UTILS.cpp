@@ -1,22 +1,18 @@
 #include "CPU_UTILS.h"
 
-const int   version_CPU        = 6;
-const int   start_video_memory = 300;
-const int   window_width       = 150;
-const int   window_height      = 40;
-const char *input_filename     = "C:/Users/penko/Projects/Compiler/Generals/code_machine.bin";
-const char *output_filename    = "C:/Users/penko/Projects/Compiler/CPU/Result.txt";
-
 void init_CPU(SoftCPU *CPU)
 {
     assert(CPU);
+    const int start_video_memory = 300;
+    const char *input_filename   = "./Generals/code_machine.bin";
+    const char *output_filename  = "./CPU/Result.txt";
 
-    FILE *code_bin    = fopen(input_filename, "rb");
+    FILE *code_bin = fopen(input_filename, "rb");
     assert(code_bin);
 
-    size_t file_size  = get_file_size(code_bin);
+    size_t file_size = get_file_size(code_bin);
 
-    Header *data      = (Header *)calloc(file_size, 1);
+    Header *data = (Header *)calloc(file_size, 1);
     assert(data);
 
     fread(data, file_size, 1, code_bin);
@@ -35,7 +31,9 @@ void init_CPU(SoftCPU *CPU)
 }
 
 void execute_CPU(SoftCPU *CPU)
-{
+{       
+    const int window_width       = 150;
+    const int window_height      = 40;    
 
     #define STACK        CPU->main_stk
     #define POP(val)     StackPop(STACK, val)
@@ -90,6 +88,7 @@ void execute_CPU(SoftCPU *CPU)
 
 void CheckHead(Header head)
 {
+    const int version_CPU = 6;
     if (strcmp(head.signature, "PDA"))
     {
         printf("Wrong signature!");

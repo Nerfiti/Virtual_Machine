@@ -35,14 +35,14 @@ enum Regs
 };
 
 
-int  ProcArgsGetMode (char *args_line, int *args, int *argc);
+int  ProcArgsGetMode (ASM_t ASM, char *args_line, int *args, int *argc, bool first_assemble);
 void init_ASM        (ASM_t *ASM);
 void execute_ASM     (ASM_t *ASM, bool first_assemble);
-int  SearchName      (char *name);
+int  SearchName      (ASM_t ASM, char *name);
 void PrintListing    (FILE *listingfile, char *asm_line, int *code, int argc);
 void PrintHeader     (FILE* listing_file, Header head);
 void DelComment      (char *line, char comm_symbol);
-void SetLabel        (char *command, int value);
+void SetLabel        (ASM_t *ASM, char *command, int value);
 void PrintCode       (FILE *out_bin, Header head, int *code, int code_len);
 int  GetRegNum       (char *reg_name);
 

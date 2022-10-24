@@ -1,35 +1,101 @@
 PDA 6
-dump                 |16 
-color 2              |23 2 
-dump                 |16 
 push 1               |1 1 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+dup                  |6 
+add                  |2 
+sub                  |3 
+mul                  |4 
+div                  |5 
+dup                  |6 
 dump                 |16 
+out                  |7 
+jmp next:            |8 109 
+jb next:             |9 109 
+jbe next:            |10 109 
+ja next:             |11 109 
+jae next:            |12 109 
+je next:             |13 109 
+jne next:            |14 109 
+pop 1                |15 1 
 pop RAX              |15 1 
+pop [RBX]            |15 2 
+pop [RCX + 10]       |15 10 3 
+pop [10 + RDX]       |15 10 4 
 dump                 |16 
-dump                 |16 
-push 7               |1 7 
-dump                 |16 
-pop [300 + RAX]      |15 300 1 
-dump                 |16 
-call INCREASE_RAX:   |17 24 
-dump                 |16 
-push RAX             |1 1 
-dump                 |16 
-push 130             |1 130 
-dump                 |16 
-ja print:            |11 20 
-jmp start:           |8 10 
-MTX                  |22 
-slp 45               |21 45 
-jmp print:           |8 31 
+call next:           |17 109 
+pnt                  |19 
+rnd                  |20 
+slp 22               |21 22 
+mtx                  |22 
+color 24             |23 24 
+sqr                  |24 
 hlt                  |25 
-dump                 |16 
-    push 4           |1 4 
-dump                 |16 
-    push RAX         |1 1 
-dump                 |16 
-    add              |2 
-dump                 |16 
-    pop RAX          |15 1 
-dump                 |16 
-ret                  |18 
