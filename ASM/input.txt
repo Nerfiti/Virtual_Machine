@@ -1,101 +1,133 @@
-push 1
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-dup
-add
-sub
-mul
-div
-dup
-dump
-out
-jmp next:
-jb next:
-jbe next:
-ja next:
-jae next:
-je next:
-jne next:
-pop 1
-pop RAX
-pop [RBX]
-pop [RCX + 10]
-pop [10 + RDX]
-dump
-call next:
-next:
-pnt
-rnd
-slp 22
-mtx 
-color 24
-sqr
-hlt 
+a = 100
+b = 200
+c = 100
+
+jmp start:
+
+FillVideo:
+	pop RAX
+		repeat:
+	push RAX
+	push 1
+	sub
+	pop RAX
+	pop [300 + RAX]
+	push RAX
+	push 0
+	jbe endFunc:
+	jmp repeat:
+	endFunc:
+	ret
+	
+
+start:
+	push a
+	push 0
+	je linear:
+	jmp quadratic:
+
+quadratic:
+	push b
+	dup
+	mul
+	push 400
+	push a
+	push c
+	mul
+	mul
+	sub
+	sqr
+	pop RDX
+	push RDX
+	push 0
+	jb no_value:
+	push RDX
+	push 0
+	je one_ans:
+	jmp two_ans:
+
+
+one_ans:
+	push b
+	push -100
+	mul
+	push a
+	push 200
+	mul
+	div
+	out
+	hlt
+
+two_ans:
+	push b
+	push -100
+	mul
+	dup
+	push RDX
+	add
+	push a
+	push 200
+	mul
+	div
+	out
+	push RDX
+	sub
+	push a
+	push 200
+	mul
+	div
+	out
+	hlt
+
+
+linear:
+	push b
+	push 0
+	je linb0:
+	jmp linbn0:
+
+
+linbn0:
+	push c
+	push -100
+	mul
+	push b
+	div
+	out
+	hlt
+
+linb0:
+	push c
+	push 0
+	je any_value:
+	jmp no_value:
+
+
+no_value:
+	push 78
+	push 111
+	push 32
+	push 118
+	push 97
+	push 108
+	push 117
+	push 101
+	push 8
+	call FillVideo:
+	pnt 8
+	hlt
+
+any_value:
+	push 65
+	push 110
+	push 121
+	push 32
+	push 118
+	push 97
+	push 108
+	push 117
+	push 101
+	push 9
+	call FillVideo:
+	pnt 9
+	hlt

@@ -6,8 +6,8 @@ CXXFLAGS = -I..\Generals -IC:\Users\penko\CLionProjects\Equations
 $(TARGET) : SoftCPU.o CPU_UTILS.o
 	$(LINKER) SoftCPU.o CPU_UTILS.o Eqlogger.o linesLib.o MyGeneralFunctions.o SolveEquation.o stack.o -o $(TARGET)
 
-SoftCPU.o : ../CPU/SoftCPU.cpp
+SoftCPU.o : ../CPU/SoftCPU.cpp ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(CC) $(CXXFLAGS) ../CPU/SoftCPU.cpp -o SoftCPU.o
 
-CPU_UTILS.o : ../CPU/CPU_UTILS.cpp
+CPU_UTILS.o : ../CPU/CPU_UTILS.cpp ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(CC) $(CXXFLAGS) ../CPU/CPU_UTILS.cpp -o CPU_UTILS.o

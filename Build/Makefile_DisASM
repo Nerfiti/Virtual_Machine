@@ -3,11 +3,11 @@ CC = g++ -c
 LINKER = g++
 CXXFLAGS = -I..\Generals
 
-$(TARGET) : DisASM.o DisASM_UTILS.o
+$(TARGET) : DisASM.o DisASM_UTILS.o ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(LINKER) DisASM.o DisASM_UTILS.o Eqlogger.o linesLib.o MyGeneralFunctions.o SolveEquation.o stack.o -o $(TARGET)
 
-DisASM.o : ../DisASM/DisASM.cpp
+DisASM.o : ../DisASM/DisASM.cpp ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(CC) $(CXXFLAGS) ../DisASM/DisASM.cpp -o DisASM.o
 
-DisASM_UTILS.o : ../DisASM/DisASM_UTILS.cpp
+DisASM_UTILS.o : ../DisASM/DisASM_UTILS.cpp ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(CC) $(CXXFLAGS) ../DisASM/DisASM_UTILS.cpp -o DisASM_UTILS.o

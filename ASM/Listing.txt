@@ -1,101 +1,103 @@
 PDA 6
-push 1               |1 1 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-dup                  |6 
-add                  |2 
-sub                  |3 
-mul                  |4 
-div                  |5 
-dup                  |6 
-dump                 |16 
-out                  |7 
-jmp next:            |8 109 
-jb next:             |9 109 
-jbe next:            |10 109 
-ja next:             |11 109 
-jae next:            |12 109 
-je next:             |13 109 
-jne next:            |14 109 
-pop 1                |15 1 
-pop RAX              |15 1 
-pop [RBX]            |15 2 
-pop [RCX + 10]       |15 10 3 
-pop [10 + RDX]       |15 10 4 
-dump                 |16 
-call next:           |17 109 
-pnt                  |19 
-rnd                  |20 
-slp 22               |21 22 
-mtx                  |22 
-color 24             |23 24 
-sqr                  |24 
-hlt                  |25 
+jmp start:           | 8 23 
+	pop RAX             | 15 1 
+	push RAX            | 1 1 
+	push 1              | 1 1 
+	sub                 | 3 
+	pop RAX             | 15 1 
+	pop [300 + RAX]     | 15 300 1 
+	push RAX            | 1 1 
+	push 0              | 1 0 
+	jbe endFunc:        | 10 22 
+	jmp repeat:         | 8 4 
+	ret                 | 18 
+	push a              | 1 0 
+	push 0              | 1 0 
+	je linear:          | 13 101 
+	jmp quadratic:      | 8 31 
+	push b              | 1 0 
+	dup                 | 6 
+	mul                 | 4 
+	push 400            | 1 400 
+	push a              | 1 0 
+	push c              | 1 0 
+	mul                 | 4 
+	mul                 | 4 
+	sub                 | 3 
+	sqr                 | 24 
+	pop RDX             | 15 4 
+	push RDX            | 1 4 
+	push 0              | 1 0 
+	jb no_value:        | 9 127 
+	push RDX            | 1 4 
+	push 0              | 1 0 
+	je one_ans:         | 13 61 
+	jmp two_ans:        | 8 74 
+	push b              | 1 0 
+	push -100           | 1 -100 
+	mul                 | 4 
+	push a              | 1 0 
+	push 200            | 1 200 
+	mul                 | 4 
+	div                 | 5 
+	out                 | 7 
+	hlt                 | 25 
+	push b              | 1 0 
+	push -100           | 1 -100 
+	mul                 | 4 
+	dup                 | 6 
+	push RDX            | 1 4 
+	add                 | 2 
+	push a              | 1 0 
+	push 200            | 1 200 
+	mul                 | 4 
+	div                 | 5 
+	out                 | 7 
+	push RDX            | 1 4 
+	sub                 | 3 
+	push a              | 1 0 
+	push 200            | 1 200 
+	mul                 | 4 
+	div                 | 5 
+	out                 | 7 
+	hlt                 | 25 
+	push b              | 1 0 
+	push 0              | 1 0 
+	je linb0:           | 13 119 
+	jmp linbn0:         | 8 109 
+	push c              | 1 0 
+	push -100           | 1 -100 
+	mul                 | 4 
+	push b              | 1 0 
+	div                 | 5 
+	out                 | 7 
+	hlt                 | 25 
+	push c              | 1 0 
+	push 0              | 1 0 
+	je any_value:       | 13 150 
+	jmp no_value:       | 8 127 
+	push 78             | 1 78 
+	push 111            | 1 111 
+	push 32             | 1 32 
+	push 118            | 1 118 
+	push 97             | 1 97 
+	push 108            | 1 108 
+	push 117            | 1 117 
+	push 101            | 1 101 
+	push 8              | 1 8 
+	call FillVideo:     | 17 2 
+	pnt 8               | 19 8 
+	hlt                 | 25 
+	push 65             | 1 65 
+	push 110            | 1 110 
+	push 121            | 1 121 
+	push 32             | 1 32 
+	push 118            | 1 118 
+	push 97             | 1 97 
+	push 108            | 1 108 
+	push 117            | 1 117 
+	push 101            | 1 101 
+	push 9              | 1 9 
+	call FillVideo:     | 17 2 
+	pnt 9               | 19 9 
+	hlt                 | 25 

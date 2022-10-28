@@ -37,7 +37,7 @@ enum Regs
 
 int  ProcArgsGetMode (ASM_t ASM, char *args_line, int *args, int *argc, bool first_assemble);
 void init_ASM        (ASM_t *ASM);
-void execute_ASM     (ASM_t *ASM, bool first_assemble);
+int  execute_ASM     (ASM_t *ASM, bool first_assemble);
 int  SearchName      (ASM_t ASM, char *name);
 void PrintListing    (FILE *listingfile, char *asm_line, int *code, int argc);
 void PrintHeader     (FILE* listing_file, Header head);

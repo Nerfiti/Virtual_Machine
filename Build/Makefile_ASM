@@ -6,8 +6,8 @@ CXXFLAGS = -I..\Generals
 $(TARGET) : ASM.o ASM_UTILS.o
 	$(LINKER) ASM.o ASM_UTILS.o Eqlogger.o linesLib.o MyGeneralFunctions.o SolveEquation.o stack.o -o $(TARGET)
 
-ASM.o : ../ASM/ASM.cpp
+ASM.o : ../ASM/ASM.cpp ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(CC) $(CXXFLAGS) ../ASM/ASM.cpp -o ASM.o
 
-ASM_UTILS.o : ../ASM/ASM_UTILS.cpp
+ASM_UTILS.o : ../ASM/ASM_UTILS.cpp ../Generals/cmds.h ../Generals/Comp_Generals.h ../Generals/linesLib.h ../Generals/MyGeneralFunctions.h ../Generals/stack.h
 	$(CC) $(CXXFLAGS) ../ASM/ASM_UTILS.cpp -o ASM_UTILS.o

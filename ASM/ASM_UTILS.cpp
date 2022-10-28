@@ -14,7 +14,7 @@ void init_ASM(ASM_t *ASM)
 }
 
 
-void execute_ASM(ASM_t *ASM, bool first_assemble)
+int execute_ASM(ASM_t *ASM, bool first_assemble)
 {
     Header head = {};
 
@@ -82,7 +82,7 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
             else 
             {
                 printf("Syntax Error: non-existent command: %s", command);
-                abort();
+                return -1;
             }
         }
 
@@ -95,6 +95,7 @@ void execute_ASM(ASM_t *ASM, bool first_assemble)
 
     assert(!fclose(listing_file));
     assert(!fclose(out_bin    ));
+    return 0;
 }
 
 int SearchName(ASM_t ASM, char *name)
@@ -213,11 +214,11 @@ int ProcArgsGetMode(ASM_t ASM, char *args_line, int *args, int *argc, bool first
 
 void PrintListing(FILE* listing_file, char *asm_line, int *code, int argc)
 {
-    fprintf(listing_file, "%-20s |", asm_line);
+    fprintf(listing_file, "%-20s | %d ", asm_line, code[0] & cmd_id_mask);
     
-    for (int i = 0; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
-        fprintf(listing_file, "%d ", code[i] & cmd_id_mask);
+        fprintf(listing_file, "%d ", code[i]);
     }
     fprintf(listing_file, "\n");
 }
@@ -258,21 +259,22 @@ void PrintCode(FILE *out_bin, Header head, int *code, int code_len)
 
 int GetRegNum(char *reg_name)
 {
-    if (strnicmp(reg_name, "RAX", 3) == 0)
+    const int reg_len = 3;
+    if (strnicmp(reg_name, "RAX", reg_len) == 0)
     {
         return RAX;
     }
-    if (strnicmp(reg_name, "RBX", 3) == 0)
+    if (strnicmp(reg_name, "RBX", reg_len) == 0)
     {
         return RBX;
     }
-    if (strnicmp(reg_name, "RCX", 3) == 0)
+    if (strnicmp(reg_name, "RCX", reg_len) == 0)
     {
         return RCX;
     }
-    if (strnicmp(reg_name, "RDX", 3) == 0)
+    if (strnicmp(reg_name, "RDX", reg_len) == 0)
     {
         return RDX;
-    }
+    } 
     return Wrong_Reg;
 }
