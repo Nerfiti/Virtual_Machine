@@ -1,18 +1,24 @@
-a = 100
-b = 200
-c = 100
+IN
+pop RAX
+
+IN
+pop RBX
+
+IN
+pop RCX
+
 
 jmp start:
 
 FillVideo:
-	pop RAX
+	pop RDX
 		repeat:
-	push RAX
+	push RDX
 	push 1
 	sub
-	pop RAX
-	pop [300 + RAX]
-	push RAX
+	pop RDX
+	pop [300 + RDX]
+	push RDX
 	push 0
 	jbe endFunc:
 	jmp repeat:
@@ -21,22 +27,21 @@ FillVideo:
 	
 
 start:
-	push a
+	push RAX 
 	push 0
 	je linear:
 	jmp quadratic:
 
 quadratic:
-	push b
+	push RBX
 	dup
 	mul
 	push 400
-	push a
-	push c
+	push RAX
+	push RCX
 	mul
 	mul
 	sub
-	sqr
 	pop RDX
 	push RDX
 	push 0
@@ -48,10 +53,10 @@ quadratic:
 
 
 one_ans:
-	push b
+	push RBX
 	push -100
 	mul
-	push a
+	push RAX
 	push 200
 	mul
 	div
@@ -59,20 +64,21 @@ one_ans:
 	hlt
 
 two_ans:
-	push b
+	push RBX
 	push -100
 	mul
 	dup
 	push RDX
+	sqr
 	add
-	push a
+	push RAX
 	push 200
 	mul
 	div
 	out
 	push RDX
 	sub
-	push a
+	push RAX
 	push 200
 	mul
 	div
@@ -81,23 +87,23 @@ two_ans:
 
 
 linear:
-	push b
+	push RBX
 	push 0
 	je linb0:
 	jmp linbn0:
 
 
 linbn0:
-	push c
+	push RCX
 	push -100
 	mul
-	push b
+	push RBX
 	div
 	out
 	hlt
 
 linb0:
-	push c
+	push RCX
 	push 0
 	je any_value:
 	jmp no_value:

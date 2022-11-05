@@ -10,35 +10,30 @@ void init_ASM(ASM_t *ASM)
     file_to_memory(input_file, &ASM->input_data);
     text_to_lines (&ASM->input_data);
 
+    ASM->code = (int *)calloc(3 * ASM->input_data.nLines, sizeof(int));
+    assert(ASM->code);
+
     assert(!fclose(input_file));
 }
 
-
 int execute_ASM(ASM_t *ASM, bool first_assemble)
 {
-    Header head = {};
-
-    const char *listing_filename  = "./ASM/Listing.txt";
-    const char *out_bin_filename  = "./Generals/code_machine.bin";
+    const char *listing_filename = "./ASM/Listing.txt";
 
     FILE *listing_file = fopen(listing_filename, "w");
-    FILE *out_bin      = fopen(out_bin_filename, "wb");
     
     assert(listing_file);
-    assert(out_bin     );
 
-    int *code    = (int *)calloc(2 * ASM->input_data.nLines, sizeof(int));
-    assert(code);
-
+    int *code    = ASM->code;
     int line     = 0;
     int position = 0;
-    int IP       = 0;
     ASM->index   = 0;
+    ASM->ip      = 0;
     Text *input_data = &ASM->input_data;
 
     char command[maximum_cmd_length + 1] = "";  
     
-    PrintHeader(listing_file, head);
+    PrintHeader(listing_file);
 
     while(line < input_data->nLines)
     {
@@ -48,17 +43,17 @@ int execute_ASM(ASM_t *ASM, bool first_assemble)
         char *string = input_data->lines[line].start;
         sscanf(string, "%s%n %s", command, &position, arg);
 
-        #define DEF_CMD(cmd, num, ...)                                                                      \
-            if (stricmp(command, cmds[num]) == 0)                                                           \
-            {                                                                                               \
-                int argc = 0;                                                                               \
-                int mode = ProcArgsGetMode(*ASM, string + position, code + IP + 1, &argc, first_assemble);  \
-                code[IP] = CMD_##cmd | mode;                                                                \
-                                                                                                            \
-                PrintListing(listing_file, string, code + IP, argc + 1);                                    \
-                                                                                                            \
-                IP += argc + 1;                                                                             \
-            }                                                                                               \
+        #define DEF_CMD(cmd, num, ...)                                                                          \
+            if (stricmp(command, cmds[num]) == 0)                                                               \
+            {                                                                                                   \
+                int argc = 0;                                                                                   \
+                int mode = ProcArgsGetMode(*ASM, string + position, code + ASM->ip + 1, &argc, first_assemble); \
+                code[ASM->ip] = CMD_##cmd | mode;                                                               \
+                                                                                                                \
+                PrintListing(listing_file, string, code + ASM->ip, argc + 1);                                   \
+                                                                                                                \
+                ASM->ip += argc + 1;                                                                            \
+            }                                                                                                   \
             else                                                                               
 
         #include "cmds.h"
@@ -66,7 +61,7 @@ int execute_ASM(ASM_t *ASM, bool first_assemble)
         {
             if (strchr(command, ':'))
             {
-                SetLabel(ASM, command, IP);
+                SetLabel(ASM, command, ASM->ip);
             }
             else if (stricmp(command, ";") == 0)
             {
@@ -91,14 +86,60 @@ int execute_ASM(ASM_t *ASM, bool first_assemble)
         line++;
     }
     
-    PrintCode(out_bin, head, code, IP);
-
     assert(!fclose(listing_file));
-    assert(!fclose(out_bin    ));
     return 0;
 }
 
-int SearchName(ASM_t ASM, char *name)
+void optimizeExecute(ASM_t *ASM) //-O9
+{
+    int *code = ASM->code;
+    int  argc = 0;
+
+    for (int ip = 0; ip < 3*ASM->input_data.nLines*sizeof(int); ip += argc + 1)
+    {
+        if (code[ip] == CMD_PUSH || code[ip] == CMD_POP)
+        {
+            argc = 1;
+            if (code[ip] & With_PLUS)
+            {
+                argc = 2;
+            }
+        }
+        else if (code[ip] == CMD_CALL || code[ip] == CMD_PNT || code[ip] == CMD_SLP || code[ip] == CMD_COLOR)
+        {
+            argc = 1;
+        }
+        else if (code[ip] == CMD_JB   || code[ip] == CMD_JBE || code[ip] == CMD_JA ||
+                 code[ip] == CMD_JAE  || code[ip] == CMD_JE  || code[ip] == CMD_JNE)
+        {
+            if (code[ip + 1] == ip + 2   && ip > 3 && 
+                code[ip - 2] == CMD_PUSH && code[ip - 4] == CMD_PUSH)
+            {
+                argc = 1;
+                for (int i = ip - 4; i <= ip + 1; ++i)
+                {
+                    code[i] = CMD_NOP;
+                }
+            }
+        }   
+        else if (code[ip] == CMD_JMP)
+        {
+            argc = 1;
+
+            if(code[ip + 1] == ip + 2)
+            {
+                code[ip]     = CMD_NOP;
+                code[ip + 1] = CMD_NOP;
+            }
+        }
+        else
+        {
+            argc = 0;
+        }
+    }
+}
+
+int  SearchName(ASM_t ASM, char *name)
 {
     for (int i = 0; i < label_arr_size; ++i)
     {
@@ -110,7 +151,7 @@ int SearchName(ASM_t ASM, char *name)
     return -1;
 }
 
-int ProcArgsGetMode(ASM_t ASM, char *args_line, int *args, int *argc, bool first_assemble)
+int  ProcArgsGetMode(ASM_t ASM, char *args_line, int *args, int *argc, bool first_assemble)
 {
     if (strchr(args_line, ':') && first_assemble)
     {
@@ -223,8 +264,9 @@ void PrintListing(FILE* listing_file, char *asm_line, int *code, int argc)
     fprintf(listing_file, "\n");
 }
 
-void PrintHeader(FILE* listing_file, Header head)
+void PrintHeader(FILE* listing_file)
 {
+    Header head = {};
     fprintf(listing_file, "%s %d\n", head.signature, head.version);
 }
 
@@ -251,13 +293,21 @@ void SetLabel(ASM_t *ASM, char *command, int value)
     }
 }
 
-void PrintCode(FILE *out_bin, Header head, int *code, int code_len)
+void PrintCode(int *code, int code_len)
 {
-    fwrite(&head, sizeof(char), sizeof(Header)  , out_bin);
+    const char *out_bin_filename = "./Generals/code_machine.bin";
+    FILE *out_bin = fopen(out_bin_filename, "wb");
+    assert(out_bin);
+
+    Header head = {};
+
+    fwrite(&head, sizeof(char), sizeof(Header), out_bin);
     fwrite(code , sizeof(char), code_len * sizeof(int), out_bin);
+
+    assert(!fclose(out_bin));
 }
 
-int GetRegNum(char *reg_name)
+int  GetRegNum(char *reg_name)
 {
     const int reg_len = 3;
     if (strnicmp(reg_name, "RAX", reg_len) == 0)
@@ -277,4 +327,27 @@ int GetRegNum(char *reg_name)
         return RDX;
     } 
     return Wrong_Reg;
+}
+
+void ASM_Dtor(ASM_t *ASM)
+{
+    free(ASM->code);
+    ASM->index = -1;
+}
+
+ProgMode getProgramMode(const int argc, const char *argv[])
+{
+    ProgMode mode = 0;
+    for (int i = 1; i < argc; ++i)
+    {
+        if (strcmp(argv[i], "-O9") == 0)
+        {
+            mode |= O9;
+        }
+        else
+        {
+            mode |= WrongMode;
+        }
+    }
+    return mode;
 }

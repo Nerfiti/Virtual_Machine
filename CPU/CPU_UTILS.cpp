@@ -6,7 +6,7 @@
 #define IP           CPU->IP
 #define CODE         CPU->code
 #define CMD          CODE[IP]
-#define ARG(n)       CODE[IP + n]//
+#define ARG(n)       CODE[IP + n]
 #define REG(n)       CPU->reg[n]
 #define RAM(n)       CPU->ram[n]
 #define RETSTACK     CPU->ret_stk

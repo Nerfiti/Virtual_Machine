@@ -203,6 +203,18 @@ void execute_ASM(DisASM *disasm)
                 IP++;
                 break;
             }
+            case CMD_IN:
+            {
+                fprintf(DisASM_result, "IN\n");
+                IP++;
+                break;
+            }
+            case CMD_NOP:
+            {
+                fprintf(DisASM_result, "NOP\n");
+                IP++;
+                break;
+            }
             case CMD_HLT:
             {
                 fprintf(DisASM_result, "HLT\n");

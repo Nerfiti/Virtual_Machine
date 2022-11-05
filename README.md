@@ -113,3 +113,7 @@ OR
 "pop [5+RDX]" or "pop [RDX+5]"
 
 -----------------------------------------------------------------------------------------------
+Processor have optimization with -O9 flag. If you use this program mode, ASM replace useful jumps
+(and) jumps with conditions to the next IP on the NOP.
+
+-----------------------------------------------------------------------------------------------

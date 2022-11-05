@@ -23,6 +23,9 @@ struct ASM_t
     
     int index = 0;
     label label_arr[label_arr_size] = {};
+
+    int *code = nullptr;
+    int ip    = 0;
 };
 
 enum Regs
@@ -35,15 +38,26 @@ enum Regs
 };
 
 
+typedef char ProgMode;
+enum ProgramMode 
+{
+    WrongMode = 1 << 0,
+    O9        = 1 << 1
+};
+
+
+char getProgramMode  (const int argc, const char *argv[]);
 int  ProcArgsGetMode (ASM_t ASM, char *args_line, int *args, int *argc, bool first_assemble);
 void init_ASM        (ASM_t *ASM);
 int  execute_ASM     (ASM_t *ASM, bool first_assemble);
+void optimizeExecute (ASM_t *ASM);
 int  SearchName      (ASM_t ASM, char *name);
-void PrintListing    (FILE *listingfile, char *asm_line, int *code, int argc);
-void PrintHeader     (FILE* listing_file, Header head);
+void PrintListing    (FILE *listing_file, char *asm_line, int *code, int argc);
+void PrintHeader     (FILE* listing_file);
 void DelComment      (char *line, char comm_symbol);
 void SetLabel        (ASM_t *ASM, char *command, int value);
-void PrintCode       (FILE *out_bin, Header head, int *code, int code_len);
+void PrintCode       (int *code, int code_len);
 int  GetRegNum       (char *reg_name);
+void ASM_Dtor        (ASM_t *ASM);
 
 #endif //ASM_UTILS_H

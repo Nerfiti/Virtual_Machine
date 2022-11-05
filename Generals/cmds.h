@@ -166,7 +166,20 @@ DEF_CMD(SQR, 24,
             IP++;
             )
 
-DEF_CMD(HLT, 25,
+DEF_CMD(IN, 25,
+            scanf("%d", &first_operand);
+            PUSH(first_operand);
+            IP++;
+        )
+
+DEF_CMD(NOP, 0x90,
+            do 
+            {
+                IP++;
+            } while (CMD == CMD_NOP);
+        )
+
+DEF_CMD(HLT, 27,
             assert(!fclose(CPU->result));
             return;
         )
