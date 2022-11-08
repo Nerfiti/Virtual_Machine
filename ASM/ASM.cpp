@@ -25,11 +25,6 @@ int main(const int argc, const char *argv[])
         optimizeExecute(&ASM);
     }
 
-    for (int i = 0; i < ASM.ip; ++i)
-    {
-        printf("CODE[%d] = %d\n", i, ASM.code[i]);
-    }
-
     PrintCode(ASM.code, ASM.ip);
     ASM_Dtor(&ASM);
 

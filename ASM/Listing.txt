@@ -1,11 +1,17 @@
 PDA 6
+push 1               | 1 1 
+push 2               | 1 2 
+je test1:            | 13 6 
 IN                   | 25 
 pop RAX              | 15 1 
 IN                   | 25 
 pop RBX              | 15 2 
 IN                   | 25 
 pop RCX              | 15 3 
-jmp start:           | 8 32 
+push 1               | 1 1 
+push 2               | 1 2 
+je test:             | 13 21 
+jmp start:           | 8 44 
 	pop RDX             | 15 4 
 	push RDX            | 1 4 
 	push 1              | 1 1 
@@ -14,13 +20,13 @@ jmp start:           | 8 32
 	pop [300 + RDX]     | 15 300 4 
 	push RDX            | 1 4 
 	push 0              | 1 0 
-	jbe endFunc:        | 10 31 
-	jmp repeat:         | 8 13 
+	jbe endFunc:        | 10 43 
+	jmp repeat:         | 8 25 
 	ret                 | 18 
 	push RAX            | 1 1 
 	push 0              | 1 0 
-	je linear:          | 13 110 
-	jmp quadratic:      | 8 40 
+	je linear:          | 13 122 
+	jmp quadratic:      | 8 52 
 	push RBX            | 1 2 
 	dup                 | 6 
 	mul                 | 4 
@@ -33,11 +39,11 @@ jmp start:           | 8 32
 	pop RDX             | 15 4 
 	push RDX            | 1 4 
 	push 0              | 1 0 
-	jb no_value:        | 9 136 
+	jb no_value:        | 9 148 
 	push RDX            | 1 4 
 	push 0              | 1 0 
-	je one_ans:         | 13 69 
-	jmp two_ans:        | 8 82 
+	je one_ans:         | 13 81 
+	jmp two_ans:        | 8 94 
 	push RBX            | 1 2 
 	push -100           | 1 -100 
 	mul                 | 4 
@@ -69,8 +75,8 @@ jmp start:           | 8 32
 	hlt                 | 27 
 	push RBX            | 1 2 
 	push 0              | 1 0 
-	je linb0:           | 13 128 
-	jmp linbn0:         | 8 118 
+	je linb0:           | 13 140 
+	jmp linbn0:         | 8 130 
 	push RCX            | 1 3 
 	push -100           | 1 -100 
 	mul                 | 4 
@@ -80,8 +86,8 @@ jmp start:           | 8 32
 	hlt                 | 27 
 	push RCX            | 1 3 
 	push 0              | 1 0 
-	je any_value:       | 13 159 
-	jmp no_value:       | 8 136 
+	je any_value:       | 13 171 
+	jmp no_value:       | 8 148 
 	push 78             | 1 78 
 	push 111            | 1 111 
 	push 32             | 1 32 
@@ -91,7 +97,7 @@ jmp start:           | 8 32
 	push 117            | 1 117 
 	push 101            | 1 101 
 	push 8              | 1 8 
-	call FillVideo:     | 17 11 
+	call FillVideo:     | 17 23 
 	pnt 8               | 19 8 
 	hlt                 | 27 
 	push 65             | 1 65 
@@ -104,6 +110,6 @@ jmp start:           | 8 32
 	push 117            | 1 117 
 	push 101            | 1 101 
 	push 9              | 1 9 
-	call FillVideo:     | 17 11 
+	call FillVideo:     | 17 23 
 	pnt 9               | 19 9 
 	hlt                 | 27 
